@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+.news_message li.status:hover {
+    background: #FFFFEE !important;
+}
+
+.__xxx_readahead {
+    font-size: 14px;
+    margin-top: 7px !important;
+}
+
+.__xxx_readahead p {
+    padding: 2px 7px !important;
+}
+
+.__xxx_readahead time {
+    color: grey;
+    font-size: 10px;
+    padding: 5px 7px !important;
+}
+
+.__xxx_readahead a:hover {
+    text-decoration: underline !important;
+}
+
+.__xxx_comment {
+    font-size: 12px;
+    margin-right: 10px !important;
+    border: solid #D2D9E7;
+    border-width: 1px 1px 0 1px;
+}
+
+.__xxx_comment li {
+    border-bottom: 1px solid #D2D9E7;
+    padding: 5px 7px !important;
+}

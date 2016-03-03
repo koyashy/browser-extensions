@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+
+    "name": "Talknote timeline extension",
+    "description": "This extension shows timeline in news page.",
+    "version": "1.0.0",
+
+    "icons": {
+        "16": "icons/talknote_logo_16.png",
+        "48": "icons/talknote_logo_48.png",
+        "128": "icons/talknote_logo_128.png"
+    },
+
+    "content_scripts": [{
+        "matches": ["https://company.talknote.com/*/news/"],
+        "css": ["css/style.css"],
+        "js": [
+            "js/jquery-2.2.1.min.js",
+            "js/script.js"
+        ],
+        "run_at": "document_end"
+    }]
+}
