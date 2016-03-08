@@ -10,17 +10,17 @@ var __xxx = {
         str = this.br(str);
         return str;
     },
-    groupPostUrlPattern : /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+)/,
-    timelinePostUrlPattern : /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+)/,
+    groupPostPattern : /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+)/,
+    publicPostPattern : /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+)/,
     restUrl : function(url) {
-        var groupPostUrlPattern = this.groupPostUrlPattern;
-        if (groupPostUrlPattern.test(url)) {
-            var match = groupPostUrlPattern.exec(url);
+        // グループへの投稿の場合
+        if (this.groupPostPattern.test(url)) {
+            var match = this.groupPostPattern.exec(url);
             return "/"+match[1]+"/rest/group/"+match[2]+"/"+match[3];
         }
-        var timelinePostUrlPattern = this.timelinePostUrlPattern;
-        if (timelinePostUrlPattern.test(url)) {
-            var match = timelinePostUrlPattern.exec(url);
+        // 全社投稿の場合
+        if (this.publicPostPattern.test(url)) {
+            var match = this.publicPostPattern.exec(url);
             return "/"+match[1]+"/rest/timeline/"+match[2];
         }
         throw "Unknown URL pattern";
