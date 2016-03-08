@@ -10,12 +10,20 @@ var __xxx = {
         str = this.br(str);
         return str;
     },
+    groupPostUrlPattern : /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+)/,
+    timelinePostUrlPattern : /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+)/,
     restUrl : function(url) {
-        var match = url.match(/\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+)/);
-        if (match[0]) {
+        var groupPostUrlPattern = this.groupPostUrlPattern;
+        if (groupPostUrlPattern.test(url)) {
+            var match = groupPostUrlPattern.exec(url);
             return "/"+match[1]+"/rest/group/"+match[2]+"/"+match[3];
         }
-        throw false;
+        var timelinePostUrlPattern = this.timelinePostUrlPattern;
+        if (timelinePostUrlPattern.test(url)) {
+            var match = timelinePostUrlPattern.exec(url);
+            return "/"+match[1]+"/rest/timeline/"+match[2];
+        }
+        throw "Unknown URL pattern";
     },
     nameLink : function(msg) {
         return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time><br />"
