@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Akira Koyasu</string>
 	<key>Builder Version</key>
-	<string>11601.4.4</string>
+	<string>11601.5.17.1</string>
 	<key>CFBundleDisplayName</key>
 	<string>Talknote timeline extension</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>1.0.1</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>Content</key>
 	<dict>
 		<key>Scripts</key>
@@ -38,18 +38,24 @@
 	<key>Description</key>
 	<string>This extension shows timeline in news page.</string>
 	<key>DeveloperIdentifier</key>
-	<string>0000000000</string>
+	<string>C2AGCLBW3A</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
 	<dict>
 		<key>Website Access</key>
 		<dict>
+			<key>Allowed Domains</key>
+			<array>
+				<string>company.talknote.com</string>
+			</array>
 			<key>Include Secure Pages</key>
 			<true/>
 			<key>Level</key>
-			<string>All</string>
+			<string>Some</string>
 		</dict>
 	</dict>
+	<key>Update Manifest URL</key>
+	<string>https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/updates.plist</string>
 </dict>
 </plist>
