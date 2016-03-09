@@ -13,7 +13,7 @@
     },
 
     "content_scripts": [{
-        "matches": ["https://company.talknote.com/*/news/"],
+        "matches": ["https://company.talknote.com/*"],
         "css": ["css/style.css"],
         "js": [
             "js/jquery-2.2.1.min.js",

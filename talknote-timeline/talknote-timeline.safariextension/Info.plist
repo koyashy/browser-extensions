@@ -32,7 +32,7 @@
 		</array>
 		<key>Whitelist</key>
 		<array>
-			<string>https://company.talknote.com/*/news/</string>
+			<string>https://company.talknote.com/*</string>
 		</array>
 	</dict>
 	<key>Description</key>
