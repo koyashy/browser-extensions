@@ -1,4 +1,4 @@
-var __xxx = {
+var __ttex = {
     onNewsPage : function() {
         return location.pathname.search(/\/[^/]+\/news\//) == 0;
     },
@@ -36,9 +36,14 @@ var __xxx = {
 
 $(function($) {
     var loop = function() {
-        if (__xxx.onNewsPage()) {
-            $("title, .container_title h2").text("TIMELINE @extention");
-            // console.timeStamp("Timeline-extension loop");
+        // console.timeStamp("Timeline-extension loop");
+        if (__ttex.onNewsPage()) {
+            if (!$("#feeds").attr("data-ttex-init")) {
+                // 初期化処理
+                $("title, .container_title h2").text("TIMELINE @extention");
+                __ttex.entries = [];
+                $("#feeds").attr("data-ttex-init", true);
+            }
             $("#feeds li.status:not([data-ttex-loaded])").each(function() {
                 // 1件の通知
                 var item = $(this);
@@ -52,30 +57,30 @@ $(function($) {
                             var url = link.attr("href");
                             // console.log(url);
                             // API
-                            var restUrl = __xxx.restUrl(url)
+                            var restUrl = __ttex.restUrl(url)
                             // 既出の投稿であればスキップ
-                            if ($.inArray(restUrl, __xxx.entries) !== -1) {
+                            if ($.inArray(restUrl, __ttex.entries) !== -1) {
                                 // console.log("skip: "+url);
                                 return true;
                             }
-                            __xxx.entries.push(restUrl);
+                            __ttex.entries.push(restUrl);
                             $.getJSON(restUrl, function(res){
                                 if (res.status == 1) {
                                     var msg = res.data.message
                                     // console.log(msg);
                                     // ボックスを生成して投稿を読み込む
-                                    var loadBox = item.append("<div class='__xxx_readahead'></div>")
-                                        .children(".__xxx_readahead")
+                                    var loadBox = item.append("<div class='__ttex_readahead'></div>")
+                                        .children(".__ttex_readahead")
                                         .html(
-                                            __xxx.nameLink(msg)
-                                            +"<p>"+__xxx.insertTags(msg.message)+"</p><ul class='__xxx_comment'></ul>"
+                                            __ttex.nameLink(msg)
+                                            +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
                                         );
                                     // コメントを読み込む
                                     $.each(msg.comment_array, function(i, comment){
                                         $("ul", loadBox).append(
                                             "<li>"
-                                            +__xxx.nameLink(comment)
-                                            +__xxx.insertTags(comment.message_com)
+                                            +__ttex.nameLink(comment)
+                                            +__ttex.insertTags(comment.message_com)
                                             +"</li>"
                                         );
                                     });
