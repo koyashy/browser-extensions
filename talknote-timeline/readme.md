@@ -14,4 +14,15 @@ Talknote「お知らせ」（[URL](https://company.talknote.com/*/news/)）に�
 
 # 開発
 ## Safariでの開発
+[公式ドキュメント](https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html)
+
+ここが結構まとまっている。少し古いけど
+http://os0x.hatenablog.com/entry/20100610/1276119135
+
 ## Chromeでの開発
+[公式ドキュメント](https://developer.chrome.com/extensions)
+
+参考
+http://liginc.co.jp/web/tool/browser/163575
+
+## 自動更新
