@@ -106,6 +106,8 @@ if (typeof chrome !== "undefined") {
                 __ttex_loop();
             }
         });
+} else if (typeof safari !== "undefined") {
+    console.log(safari);
 }
 
 __ttex_loop();

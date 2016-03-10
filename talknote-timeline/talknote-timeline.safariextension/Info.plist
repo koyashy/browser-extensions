@@ -16,6 +16,11 @@
 	<string>1.0.2</string>
 	<key>CFBundleVersion</key>
 	<string>3</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Global Page</key>
+		<string>global-safari.html</string>
+	</dict>
 	<key>Content</key>
 	<dict>
 		<key>Scripts</key>
@@ -23,7 +28,7 @@
 			<key>End</key>
 			<array>
 				<string>js/jquery-2.2.1.min.js</string>
-				<string>js/script.js</string>
+				<string>js/content.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
