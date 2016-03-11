@@ -3,7 +3,7 @@
 
     "name": "Talknote timeline extension",
     "description": "This extension shows timeline in news page.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "update_url": "https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/updates.xml",
 
     "permissions": [
