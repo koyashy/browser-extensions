@@ -23,7 +23,7 @@
 			<key>End</key>
 			<array>
 				<string>js/jquery-2.2.1.min.js</string>
-				<string>js/script.js</string>
+				<string>js/content.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>

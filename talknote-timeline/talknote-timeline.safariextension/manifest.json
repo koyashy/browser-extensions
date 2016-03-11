@@ -6,10 +6,12 @@
     "version": "1.0.2",
     "update_url": "https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/updates.xml",
 
-    "icons": {
-        "16": "icons/talknote_logo_16.png",
-        "48": "icons/talknote_logo_48.png",
-        "128": "icons/talknote_logo_128.png"
+    "permissions": [
+        "webNavigation"
+    ],
+    "background": {
+        "persistent": false,
+        "scripts": ["js/background-chrome.js"]
     },
 
     "content_scripts": [{
@@ -17,8 +19,14 @@
         "css": ["css/style.css"],
         "js": [
             "js/jquery-2.2.1.min.js",
-            "js/script.js"
+            "js/content.js"
         ],
         "run_at": "document_end"
-    }]
+    }],
+
+    "icons": {
+        "16": "icons/talknote_logo_16.png",
+        "48": "icons/talknote_logo_48.png",
+        "128": "icons/talknote_logo_128.png"
+    }
 }
