@@ -1,33 +1,42 @@
 var __ttex = {
+    logoLinkPattern : /\/([^/]+)\/index\//,
+    replace_logo_link : function(link) {
+        var url = link.attr("href");
+        if (this.logoLinkPattern.test(url)) {
+            var news_url = url.replace(this.logoLinkPattern, "/$1/news/");
+            link.attr("href", news_url);
+        }
+    },
+    newsUrlPattern : /\/[^/]+\/news\//,
     onNewsPage : function() {
-        return location.pathname.search(/\/[^/]+\/news\//) == 0;
+        return location.pathname.search(this.newsUrlPattern) == 0;
     },
     always : function() {
         return true;
     },
+    brPattern : /\r\n|\n|\r/g,
     br : function(str) {
-        return str.replace(/\r\n|\n|\r/g, "<br />");
+        return str.replace(this.brPattern, "<br />");
     },
+    hrefPattern : /https?:\/\/\S+/g,
     href : function(str) {
-        return str.replace(/https?:\/\/\S+/g, "<a href='$&'>$&</a>");
+        return str.replace(this.hrefPattern, "<a href='$&'>$&</a>");
     },
     insertTags : function(str) {
         str = this.href(str);
         str = this.br(str);
         return str;
     },
-    groupPostPattern : /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+)/,
-    publicPostPattern : /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+)/,
+    groupPostPattern : /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/,
+    publicPostPattern : /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/,
     restUrl : function(url) {
         // グループへの投稿の場合
         if (this.groupPostPattern.test(url)) {
-            var match = this.groupPostPattern.exec(url);
-            return "/"+match[1]+"/rest/group/"+match[2]+"/"+match[3];
+            return url.replace(this.groupPostPattern, "/$1/rest/group/$2/$3");
         }
         // 全社投稿の場合
         if (this.publicPostPattern.test(url)) {
-            var match = this.publicPostPattern.exec(url);
-            return "/"+match[1]+"/rest/timeline/"+match[2];
+            return url.replace(this.publicPostPattern, "/$1/rest/timeline/$2");
         }
         throw "Unknown URL pattern";
     },
@@ -39,6 +48,7 @@ var __ttex = {
 
 var __ttex_loop = function(loop_condition) {
     // console.timeStamp("Timeline-extension loop");
+    __ttex.replace_logo_link($("a.header_logo"));
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
             // 初期化処理
@@ -60,6 +70,7 @@ var __ttex_loop = function(loop_condition) {
                         // console.log(url);
                         // API
                         var restUrl = __ttex.restUrl(url)
+                        // console.log(restUrl);
                         // 既出の投稿であればスキップ
                         if ($.inArray(restUrl, __ttex.entries) !== -1) {
                             // console.log("skip: "+url);
