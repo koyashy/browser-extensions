@@ -1,3 +1,5 @@
+"use strict";
+
 var __ttex = {
     logoLinkPattern : /\/([^/]+)\/index\//,
     replace_logo_link : function(link) {
@@ -118,11 +120,11 @@ if (typeof chrome !== "undefined") {
         function(message, sender, sendResponse) {
             if (message.event == "onNewsPage") {
                 // console.log(message);
-                __ttex_loop(__ttex.onNewsPage);
+                __ttex_loop(__ttex.onNewsPage.bind(__ttex));
             }
         });
-    __ttex_loop(__ttex.onNewsPage);
+    __ttex_loop(__ttex.onNewsPage.bind(__ttex));
 } else if (typeof safari !== "undefined") {
     // console.log(safari);
-    __ttex_loop(__ttex.always);
+    __ttex_loop(__ttex.always.bind(__ttex));
 }

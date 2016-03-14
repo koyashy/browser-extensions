@@ -1,3 +1,4 @@
+"use strict";
 
 var onNewsPage = function(url) {
     return url.search(/\/[^/]+\/news\//) !== -1;
