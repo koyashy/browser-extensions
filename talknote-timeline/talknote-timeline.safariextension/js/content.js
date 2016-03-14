@@ -49,7 +49,7 @@ var __ttex = {
 };
 
 var __ttex_loop = function(loop_condition) {
-    // console.timeStamp("Timeline-extension loop");
+    // console.time("Timeline-extension loop");
     __ttex.replace_logo_link($("a.header_logo"));
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
@@ -113,18 +113,20 @@ var __ttex_loop = function(loop_condition) {
     if (loop_condition()) {
         setTimeout(__ttex_loop, 1000, loop_condition);
     }
+    // console.timeEnd("Timeline-extension loop");
 };
 
 if (typeof chrome !== "undefined") {
+    // console.log(chrome);
     chrome.runtime.onMessage.addListener(
         function(message, sender, sendResponse) {
             if (message.event == "onNewsPage") {
                 // console.log(message);
-                __ttex_loop(__ttex.onNewsPage.bind(__ttex));
+                setTimeout(__ttex_loop, 500, __ttex.onNewsPage.bind(__ttex));
             }
         });
     __ttex_loop(__ttex.onNewsPage.bind(__ttex));
 } else if (typeof safari !== "undefined") {
     // console.log(safari);
-    __ttex_loop(__ttex.always.bind(__ttex));
+    setTimeout(__ttex_loop, 500, __ttex.always.bind(__ttex));
 }
