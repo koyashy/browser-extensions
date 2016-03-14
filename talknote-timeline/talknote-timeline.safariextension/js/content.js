@@ -1,4 +1,12 @@
 var __ttex = {
+    logoLinkPattern : /\/([^/]+)\/index\//,
+    replace_logo_link : function(link) {
+        var url = link.attr("href");
+        if (this.logoLinkPattern.test(url)) {
+            var news_url = url.replace(this.logoLinkPattern, "/$1/news/");
+            link.attr("href", news_url);
+        }
+    },
     onNewsPage : function() {
         return location.pathname.search(/\/[^/]+\/news\//) == 0;
     },
@@ -39,6 +47,7 @@ var __ttex = {
 
 var __ttex_loop = function(loop_condition) {
     // console.timeStamp("Timeline-extension loop");
+    __ttex.replace_logo_link($("a.header_logo"));
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
             // 初期化処理
