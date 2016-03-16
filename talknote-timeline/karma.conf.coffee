@@ -15,8 +15,12 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
-      'talknote-timeline.safariextension/**/*.js',
-      'spec/**/*Spec.js'
+      'spec/lib/*.coffee',
+      'talknote-timeline.safariextension/js/lib/*.js',
+      'talknote-timeline.safariextension/js/jquery-2.2.1.min.js',
+      'talknote-timeline.safariextension/js/background-chrome.js',
+      'talknote-timeline.safariextension/js/content.js',
+      'spec/**/*.spec.coffee'
     ]
 
 
@@ -28,6 +32,7 @@ module.exports = (config) ->
     # preprocess matching files before serving them to the browser
     # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      '**/*.coffee': ['coffee']
     }
 
 
@@ -61,7 +66,7 @@ module.exports = (config) ->
 
     # start these browsers
     # available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome']
+    browsers: ['PhantomJS']
 
 
     # Continuous Integration mode
