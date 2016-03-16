@@ -1,3 +1,4 @@
 *.safariextension.crx
 *.pem
 *.safariextz
+node_modules/

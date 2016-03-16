@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - "5.1"
+env:
+  - PROJECT=talknote-timeline
+before_script: cd $PROJECT && npm install
+script: npm test
