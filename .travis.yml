@@ -4,4 +4,4 @@ node_js:
 env:
   - PROJECT=talknote-timeline
 before_script: cd $PROJECT && npm install
-script: cd $PROJECT && npm test
+script: npm test
