@@ -1,3 +1,3 @@
 # browser-extensions
 
-[![Build Status](https://travis-ci.com/koyashy/browser-extensions.svg?token=pf97ZXEkpBxakgNScbyD&branch=master)](https://travis-ci.com/koyashy/browser-extensions)
+[![Build Status](https://travis-ci.org/koyashy/browser-extensions.svg?branch=master)](https://travis-ci.org/koyashy/browser-extensions)
