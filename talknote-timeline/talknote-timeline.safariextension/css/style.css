@@ -27,7 +27,11 @@
 .__ttex_readahead a:hover {
     text-decoration: underline !important;
 }
-
+.__ttex_readahead .__ttex_read_more {
+    font-size: 11px;
+    border-left: 5px solid #D2D9E7;
+    padding: 0 20px;
+}
 .__ttex_comment {
     font-size: 12px;
     margin-right: 10px !important;
@@ -37,4 +41,8 @@
     margin: 3px 0 !important;
     border-left: 5px solid #D2D9E7;
     padding: 4px 7px 2px !important;
+}
+
+.__ttex_comment.__ttex_hide_more li:nth-last-child(n+10) {
+    display: none;
 }

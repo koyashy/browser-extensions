@@ -89,9 +89,23 @@ var __ttex_loop = function(loop_condition) {
                                         __ttex.nameLink(msg)
                                         +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
                                     );
+                                var commentBox = $("ul", loadBox);
+                                // コメントが多い場合は隠す
+                                if (msg.comment_array.length > 10 ) {
+                                    commentBox.addClass("__ttex_hide_more");
+                                    $("<div class='__ttex_read_more'></div>")
+                                    .insertBefore(commentBox)
+                                    .append(
+                                        $("<a>...more comments...</a>")
+                                        .click(function(event){
+                                            $(this).remove();
+                                            commentBox.removeClass("__ttex_hide_more");
+                                            return false;
+                                    }));
+                                }
                                 // コメントを読み込む
                                 $.each(msg.comment_array, function(i, comment){
-                                    $("ul", loadBox).append(
+                                    commentBox.append(
                                         "<li>"
                                         +__ttex.nameLink(comment)
                                         +"<p>"
