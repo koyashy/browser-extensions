@@ -50,11 +50,11 @@ var __ttex = {
 
 var __ttex_loop = function(loop_condition) {
     // console.time("Timeline-extension loop");
-    __ttex.replace_logo_link($("a.header_logo"));
+    __ttex.replace_logo_link($(".talknote_logo a"));
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
             // 初期化処理
-            $("title, .container_title h2").text("TIMELINE @extention");
+            $("title, #title").text("TIMELINE @extention");
             __ttex.entries = [];
             $("#feeds").attr("data-ttex-init", true);
         }
@@ -64,7 +64,6 @@ var __ttex_loop = function(loop_condition) {
             // console.log($(".message_text", item).text().trim());
             // 投稿かコメントのみを対象にする
             var link = $("a:contains('投稿'), a:contains('コメント')", item)
-                .css("border", "1px solid #f99")
                 .each(function(){
                     try {
                         var link = $(this);
