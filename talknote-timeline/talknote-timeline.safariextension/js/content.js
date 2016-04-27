@@ -91,17 +91,17 @@ var __ttex_loop = function(loop_condition) {
                                     );
                                 var commentBox = $("ul", loadBox);
                                 // コメントが多い場合は隠す
-                                if (msg.comment_array.length > 10 ) {
+                                if (msg.comment_array.length > 10) {
                                     commentBox.addClass("__ttex_hide_more");
                                     $("<div class='__ttex_read_more'></div>")
-                                    .insertBefore(commentBox)
-                                    .append(
-                                        $("<a>...more comments...</a>")
-                                        .click(function(event){
-                                            $(this).remove();
-                                            commentBox.removeClass("__ttex_hide_more");
-                                            return false;
-                                    }));
+                                        .insertBefore(commentBox)
+                                        .append(
+                                            $("<a>...more comments...</a>")
+                                                .click(function(event){
+                                                    $(this).remove();
+                                                    commentBox.removeClass("__ttex_hide_more");
+                                                    return false;
+                                        }));
                                 }
                                 // コメントを読み込む
                                 $.each(msg.comment_array, function(i, comment){
