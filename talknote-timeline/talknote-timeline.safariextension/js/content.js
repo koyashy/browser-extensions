@@ -50,7 +50,7 @@ var __ttex = {
 
 var __ttex_loop = function(loop_condition) {
     // console.time("Timeline-extension loop");
-    __ttex.replace_logo_link($("a.header_logo"));
+    __ttex.replace_logo_link($(".talknote_logo a"));
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
             // 初期化処理
