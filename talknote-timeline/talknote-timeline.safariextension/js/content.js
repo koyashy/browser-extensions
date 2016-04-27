@@ -54,7 +54,7 @@ var __ttex_loop = function(loop_condition) {
     if (__ttex.onNewsPage()) {
         if (!$("#feeds").attr("data-ttex-init")) {
             // 初期化処理
-            $("title, .container_title h2").text("TIMELINE @extention");
+            $("title, #title").text("TIMELINE @extention");
             __ttex.entries = [];
             $("#feeds").attr("data-ttex-init", true);
         }
