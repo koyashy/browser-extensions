@@ -43,7 +43,7 @@ var __ttex = {
         throw "Unknown URL pattern";
     },
     nameLink : function(msg) {
-        return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time><br />"
+        return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>"
     },
     entries : []
 };
@@ -94,8 +94,9 @@ var __ttex_loop = function(loop_condition) {
                                     $("ul", loadBox).append(
                                         "<li>"
                                         +__ttex.nameLink(comment)
+                                        +"<p>"
                                         +__ttex.insertTags(comment.message_com)
-                                        +"</li>"
+                                        +"</p></li>"
                                     );
                                 });
                             } else {
