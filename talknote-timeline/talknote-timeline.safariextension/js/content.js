@@ -64,7 +64,6 @@ var __ttex_loop = function(loop_condition) {
             // console.log($(".message_text", item).text().trim());
             // 投稿かコメントのみを対象にする
             var link = $("a:contains('投稿'), a:contains('コメント')", item)
-                .css("border", "1px solid #f99")
                 .each(function(){
                     try {
                         var link = $(this);
