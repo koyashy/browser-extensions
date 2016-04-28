@@ -51,7 +51,7 @@ var __ttex = {
     entries : []
 };
 
-var __ttex_loop = function(loop_condition) {
+var __ttex_loop = function(loop_continue) {
     // console.time("Timeline-extension loop");
     __ttex.replace_logo_link($(".talknote_logo a"));
     if (__ttex.onNewsPage()) {
@@ -67,34 +67,28 @@ var __ttex_loop = function(loop_condition) {
                 .insertAfter($("#title"));
 
             (new MutationObserver(function(mutations) {
-                console.log(mutations);
                 mutations.forEach(function(mutation) {
                     if (mutation.type === "childList") {
                         $.each(mutation.addedNodes, function(i, e) {
                             $("li.status:not([data-ttex-loaded])", $(e).parent()).each(function() {
                                 // 1件の通知
                                 var item = $(this);
-                                console.log(item);
                                 // 投稿かコメントのみを対象にする
                                 var link = $("a:contains('投稿'), a:contains('コメント')", item)
                                     .each(function(){
                                         try {
                                             var link = $(this);
                                             var url = link.attr("href");
-                                            // console.log(url);
                                             // API
                                             var restUrl = __ttex.restUrl(url)
-                                            // console.log(restUrl);
                                             // 既出の投稿であればスキップ
                                             if ($.inArray(restUrl, __ttex.entries) !== -1) {
-                                                // console.log("skip: "+url);
                                                 return true;
                                             }
                                             __ttex.entries.push(restUrl);
                                             $.getJSON(restUrl, function(res){
                                                 if (res.status == 1) {
                                                     var msg = res.data.message
-                                                    // console.log(msg);
                                                     // ボックスを生成して投稿を読み込む
                                                     var loadBox = item.append("<div class='__ttex_readahead'></div>")
                                                         .children(".__ttex_readahead")
@@ -144,23 +138,25 @@ var __ttex_loop = function(loop_condition) {
             $("#feeds").attr("data-ttex-init", true);
         }
     }
-    if (loop_condition()) {
-        setTimeout(__ttex_loop, 1000, loop_condition);
+    if (loop_continue()) {
+        setTimeout(__ttex_loop, 1000, loop_continue);
     }
     // console.timeEnd("Timeline-extension loop");
 };
 
 if (typeof chrome !== "undefined") {
+    // Chromeの場合、newsへの遷移をフックできる。ループしない
     // console.log(chrome);
     chrome.runtime.onMessage.addListener(
         function(message, sender, sendResponse) {
-            if (message.event == "onNewsPage") {
+            if (message.event == "moveToNewsPage") {
                 // console.log(message);
-                __ttex_loop(__ttex.never.bind(__ttex));
+                __ttex_loop(__ttex.never);
             }
         });
-    __ttex_loop(__ttex.never.bind(__ttex));
+    __ttex_loop(__ttex.never);
 } else if (typeof safari !== "undefined") {
+    // Safariの場合、newsへの遷移をフックできない。常にループする
     // console.log(safari);
-    __ttex_loop(__ttex.always.bind(__ttex));
+    __ttex_loop(__ttex.always);
 }
