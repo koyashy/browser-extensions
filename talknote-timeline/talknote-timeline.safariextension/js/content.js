@@ -82,10 +82,10 @@ var __ttex_loop = function(loop_continue) {
             __ttex.entries = [];
             __ttex.dom.addMarkRead();
 
+            // 通知がボックスに追加されたことをフックする
             (new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     $.each(mutation.addedNodes, function(i, e) {
-                        // 1件の通知
                         var item = $(e);
                         if (!item.is("li.status:not([data-ttex-loaded])")) {
                             // 意図通りの要素でない場合はスキップ
@@ -138,6 +138,7 @@ var __ttex_loop = function(loop_continue) {
                     });
                 });
             })).observe($('#feed_container').get(0), {childList: true});
+
             $("#feeds").attr("data-ttex-init", true);
         }
     }
