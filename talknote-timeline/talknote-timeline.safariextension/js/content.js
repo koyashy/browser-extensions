@@ -62,77 +62,86 @@ var __ttex_loop = function(loop_condition) {
                     $("li.status.unread .do_read_action").click();
                 }))
                 .insertAfter($("#title"));
-            $("#feeds").attr("data-ttex-init", true);
-        }
-        $("#feeds li.status:not([data-ttex-loaded])").each(function() {
-            // 1件の通知
-            var item = $(this);
-            // console.log($(".message_text", item).text().trim());
-            // 投稿かコメントのみを対象にする
-            var link = $("a:contains('投稿'), a:contains('コメント')", item)
-                .each(function(){
-                    try {
-                        var link = $(this);
-                        var url = link.attr("href");
-                        // console.log(url);
-                        // API
-                        var restUrl = __ttex.restUrl(url)
-                        // console.log(restUrl);
-                        // 既出の投稿であればスキップ
-                        if ($.inArray(restUrl, __ttex.entries) !== -1) {
-                            // console.log("skip: "+url);
-                            return true;
-                        }
-                        __ttex.entries.push(restUrl);
-                        $.getJSON(restUrl, function(res){
-                            if (res.status == 1) {
-                                var msg = res.data.message
-                                // console.log(msg);
-                                // ボックスを生成して投稿を読み込む
-                                var loadBox = item.append("<div class='__ttex_readahead'></div>")
-                                    .children(".__ttex_readahead")
-                                    .html(
-                                        __ttex.nameLink(msg)
-                                        +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
-                                    );
-                                var commentBox = $("ul", loadBox);
-                                // コメントが多い場合は隠す
-                                if (msg.comment_array.length > 10) {
-                                    commentBox.addClass("__ttex_hide_more");
-                                    $("<div class='__ttex_read_more'></div>")
-                                        .insertBefore(commentBox)
-                                        .append(
-                                            $("<a>...more comments...</a>")
-                                                .click(function(event){
-                                                    $(this).remove();
-                                                    commentBox.removeClass("__ttex_hide_more");
-                                                    return false;
-                                        }));
-                                }
-                                // コメントを読み込む
-                                $.each(msg.comment_array, function(i, comment){
-                                    commentBox.append(
-                                        "<li>"
-                                        +__ttex.nameLink(comment)
-                                        +"<p>"
-                                        +__ttex.insertTags(comment.message_com)
-                                        +"</p></li>"
-                                    );
-                                });
-                            } else {
-                                console.error(res.errors);
-                            }
+
+            (new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === "childList") {
+                        $.each(mutation.addedNodes, function(i, e) {
+                            $("li.status:not([data-ttex-loaded])", $(e).parent()).each(function() {
+                                // 1件の通知
+                                var item = $(this);
+                                // 投稿かコメントのみを対象にする
+                                var link = $("a:contains('投稿'), a:contains('コメント')", item)
+                                    .each(function(){
+                                        try {
+                                            var link = $(this);
+                                            var url = link.attr("href");
+                                            // console.log(url);
+                                            // API
+                                            var restUrl = __ttex.restUrl(url)
+                                            // console.log(restUrl);
+                                            // 既出の投稿であればスキップ
+                                            if ($.inArray(restUrl, __ttex.entries) !== -1) {
+                                                // console.log("skip: "+url);
+                                                return true;
+                                            }
+                                            __ttex.entries.push(restUrl);
+                                            $.getJSON(restUrl, function(res){
+                                                if (res.status == 1) {
+                                                    var msg = res.data.message
+                                                    // console.log(msg);
+                                                    // ボックスを生成して投稿を読み込む
+                                                    var loadBox = item.append("<div class='__ttex_readahead'></div>")
+                                                        .children(".__ttex_readahead")
+                                                        .html(
+                                                            __ttex.nameLink(msg)
+                                                            +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
+                                                        );
+                                                    var commentBox = $("ul", loadBox);
+                                                    // コメントが多い場合は隠す
+                                                    if (msg.comment_array.length > 10) {
+                                                        commentBox.addClass("__ttex_hide_more");
+                                                        $("<div class='__ttex_read_more'></div>")
+                                                            .insertBefore(commentBox)
+                                                            .append(
+                                                                $("<a>...more comments...</a>")
+                                                                    .click(function(event){
+                                                                        $(this).remove();
+                                                                        commentBox.removeClass("__ttex_hide_more");
+                                                                        return false;
+                                                            }));
+                                                    }
+                                                    // コメントを読み込む
+                                                    $.each(msg.comment_array, function(i, comment){
+                                                        commentBox.append(
+                                                            "<li>"
+                                                            +__ttex.nameLink(comment)
+                                                            +"<p>"
+                                                            +__ttex.insertTags(comment.message_com)
+                                                            +"</p></li>"
+                                                        );
+                                                    });
+                                                } else {
+                                                    console.error(res.errors);
+                                                }
+                                            });
+                                        } catch (e) {
+                                            console.error(e);
+                                        }
+                                    });
+                                $(item).attr("data-ttex-loaded", "");
+                            });
                         });
-                    } catch (e) {
-                        console.error(e);
                     }
                 });
-            $(item).attr("data-ttex-loaded", "");
-        });
+            })).observe($('#feed_container').get(0), {childList: true});
+
+            $("#feeds").attr("data-ttex-init", true);
+        }
     }
-    if (loop_condition()) {
-        setTimeout(__ttex_loop, 1000, loop_condition);
-    }
+    // if (loop_condition()) {
+    //     setTimeout(__ttex_loop, 1000, loop_condition);
+    // }
     // console.timeEnd("Timeline-extension loop");
 };
 
