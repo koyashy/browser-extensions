@@ -7,7 +7,7 @@ var onNewsPage = function(url) {
 chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
     // console.log(details);
     if (onNewsPage(details.url)) {
-        chrome.tabs.sendMessage(details.tabId, {event: "onNewsPage", data: details});
+        chrome.tabs.sendMessage(details.tabId, {event: "moveToNewsPage", data: details});
     }
 }, {url: [
     {hostEquals: "company.talknote.com"}

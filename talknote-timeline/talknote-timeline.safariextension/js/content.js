@@ -1,6 +1,7 @@
 "use strict";
 
 var __ttex = {
+    entries : [],
     logoLinkPattern : /\/([^/]+)\/index\//,
     replace_logo_link : function(link) {
         var url = link.attr("href");
@@ -15,6 +16,9 @@ var __ttex = {
     },
     always : function() {
         return true;
+    },
+    never : function() {
+        return false;
     },
     brPattern : /\r\n|\n|\r/g,
     br : function(str) {
@@ -45,10 +49,30 @@ var __ttex = {
     nameLink : function(msg) {
         return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>"
     },
-    entries : []
+    dom : {
+        addMarkRead : function() {
+            $("<div class='__ttex_markread'></div>")
+                .append($("<a>mark all read</a>").click(function(event) {
+                    $("li.status.unread .do_read_action").click();
+                }))
+                .insertAfter($("#title"));
+        },
+        hideManyComments : function(commentBox) {
+            commentBox.addClass("__ttex_hide_more");
+            $("<div class='__ttex_read_more'></div>")
+                .insertBefore(commentBox)
+                .append(
+                    $("<a>...more comments...</a>")
+                        .click(function(event) {
+                            $(this).remove();
+                            commentBox.removeClass("__ttex_hide_more");
+                            return false;
+                }));
+        }
+    }
 };
 
-var __ttex_loop = function(loop_condition) {
+var __ttex_loop = function(loop_continue) {
     // console.time("Timeline-extension loop");
     __ttex.replace_logo_link($(".talknote_logo a"));
     if (__ttex.onNewsPage()) {
@@ -56,97 +80,87 @@ var __ttex_loop = function(loop_condition) {
             // 初期化処理
             $("title, #title").text("TIMELINE @extention");
             __ttex.entries = [];
-            // 全て既読にするボタン
-            $("<div class='__ttex_markread'></div>")
-                .append($("<a>mark all read</a>").click(function(event) {
-                    $("li.status.unread .do_read_action").click();
-                }))
-                .insertAfter($("#title"));
-            $("#feeds").attr("data-ttex-init", true);
-        }
-        $("#feeds li.status:not([data-ttex-loaded])").each(function() {
-            // 1件の通知
-            var item = $(this);
-            // console.log($(".message_text", item).text().trim());
-            // 投稿かコメントのみを対象にする
-            var link = $("a:contains('投稿'), a:contains('コメント')", item)
-                .each(function(){
-                    try {
-                        var link = $(this);
-                        var url = link.attr("href");
-                        // console.log(url);
-                        // API
-                        var restUrl = __ttex.restUrl(url)
-                        // console.log(restUrl);
-                        // 既出の投稿であればスキップ
-                        if ($.inArray(restUrl, __ttex.entries) !== -1) {
-                            // console.log("skip: "+url);
+            __ttex.dom.addMarkRead();
+
+            // 通知がボックスに追加されたことをフックする
+            (new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    $.each(mutation.addedNodes, function(i, e) {
+                        var item = $(e);
+                        if (!item.is("li.status:not([data-ttex-loaded])")) {
+                            // 意図通りの要素でない場合はスキップ
                             return true;
                         }
-                        __ttex.entries.push(restUrl);
-                        $.getJSON(restUrl, function(res){
-                            if (res.status == 1) {
-                                var msg = res.data.message
-                                // console.log(msg);
-                                // ボックスを生成して投稿を読み込む
-                                var loadBox = item.append("<div class='__ttex_readahead'></div>")
-                                    .children(".__ttex_readahead")
-                                    .html(
-                                        __ttex.nameLink(msg)
-                                        +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
-                                    );
-                                var commentBox = $("ul", loadBox);
-                                // コメントが多い場合は隠す
-                                if (msg.comment_array.length > 10) {
-                                    commentBox.addClass("__ttex_hide_more");
-                                    $("<div class='__ttex_read_more'></div>")
-                                        .insertBefore(commentBox)
-                                        .append(
-                                            $("<a>...more comments...</a>")
-                                                .click(function(event){
-                                                    $(this).remove();
-                                                    commentBox.removeClass("__ttex_hide_more");
-                                                    return false;
-                                        }));
+                        // 投稿かコメントのみを対象にする
+                        $("a:contains('投稿'), a:contains('コメント')", item).each(function() {
+                            try {
+                                // API
+                                var restUrl = __ttex.restUrl($(this).attr("href"));
+                                // 既出の投稿であればスキップ
+                                if ($.inArray(restUrl, __ttex.entries) !== -1) {
+                                    return true;
                                 }
-                                // コメントを読み込む
-                                $.each(msg.comment_array, function(i, comment){
-                                    commentBox.append(
-                                        "<li>"
-                                        +__ttex.nameLink(comment)
-                                        +"<p>"
-                                        +__ttex.insertTags(comment.message_com)
-                                        +"</p></li>"
-                                    );
+                                __ttex.entries.push(restUrl);
+                                $.getJSON(restUrl, function(res) {
+                                    if (res.status == 1) {
+                                        var msg = res.data.message
+                                        // ボックスを生成して投稿を表示する
+                                        var loadBox = $("<div class='__ttex_readahead'></div>")
+                                            .appendTo(item)
+                                            .html(
+                                                __ttex.nameLink(msg)
+                                                +"<p>"+__ttex.insertTags(msg.message)+"</p>"
+                                            );
+                                        var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+                                        // コメントが多い場合は隠す設定をする
+                                        if (msg.comment_array.length > 10) {
+                                            __ttex.dom.hideManyComments(commentBox);
+                                        }
+                                        // コメントを表示する
+                                        $.each(msg.comment_array, function(i, comment) {
+                                            commentBox.append(
+                                                "<li>"
+                                                +__ttex.nameLink(comment)
+                                                +"<p>"
+                                                +__ttex.insertTags(comment.message_com)
+                                                +"</p></li>"
+                                            );
+                                        });
+                                    } else {
+                                        console.error(res.errors);
+                                    }
                                 });
-                            } else {
-                                console.error(res.errors);
+                            } catch (e) {
+                                console.error(e);
                             }
                         });
-                    } catch (e) {
-                        console.error(e);
-                    }
+                        $(item).attr("data-ttex-loaded", "");
+                    });
                 });
-            $(item).attr("data-ttex-loaded", "");
-        });
+            })).observe($('#feed_container').get(0), {childList: true});
+
+            $("#feeds").attr("data-ttex-init", true);
+        }
     }
-    if (loop_condition()) {
-        setTimeout(__ttex_loop, 1000, loop_condition);
+    if (loop_continue()) {
+        setTimeout(__ttex_loop, 1000, loop_continue);
     }
     // console.timeEnd("Timeline-extension loop");
 };
 
 if (typeof chrome !== "undefined") {
+    // Chromeの場合、newsへの遷移をフックできる。ループしない
     // console.log(chrome);
     chrome.runtime.onMessage.addListener(
         function(message, sender, sendResponse) {
-            if (message.event == "onNewsPage") {
+            if (message.event == "moveToNewsPage") {
                 // console.log(message);
-                setTimeout(__ttex_loop, 500, __ttex.onNewsPage.bind(__ttex));
+                __ttex_loop(__ttex.never);
             }
         });
-    __ttex_loop(__ttex.onNewsPage.bind(__ttex));
+    __ttex_loop(__ttex.never);
 } else if (typeof safari !== "undefined") {
+    // Safariの場合、newsへの遷移をフックできない。常にループする
     // console.log(safari);
-    setTimeout(__ttex_loop, 500, __ttex.always.bind(__ttex));
+    __ttex_loop(__ttex.always);
 }
