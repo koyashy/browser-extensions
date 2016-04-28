@@ -1,11 +1,23 @@
 @charset "UTF-8";
 
 .news_message li.status {
-    word-break: break-word;
+    word-wrap: break-word;
 }
 
 .news_message li.status:hover {
     background: #FFFFEE !important;
+}
+
+.__ttex_readahead a:hover,
+.__ttex_markread a:hover {
+    cursor: pointer;
+    text-decoration: underline !important;
+}
+
+.__ttex_markread {
+    display: table-cell;
+    text-align: right;
+    font-size: 10px;
 }
 
 .__ttex_readahead {
@@ -18,15 +30,16 @@
     padding: 3px 5px !important;
 }
 
+.__ttex_readahead pre {
+    white-space: pre-wrap;
+}
+
 .__ttex_readahead time {
     color: grey;
     font-size: 8px;
     padding: 5px 7px !important;
 }
 
-.__ttex_readahead a:hover {
-    text-decoration: underline !important;
-}
 .__ttex_readahead .__ttex_read_more {
     font-size: 11px;
     border-left: 5px solid #D2D9E7;

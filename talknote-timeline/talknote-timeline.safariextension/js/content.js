@@ -56,6 +56,12 @@ var __ttex_loop = function(loop_condition) {
             // 初期化処理
             $("title, #title").text("TIMELINE @extention");
             __ttex.entries = [];
+            // 全て既読にするボタン
+            $("<div class='__ttex_markread'></div>")
+                .append($("<a>mark all read</a>").click(function(event) {
+                    $("li.status.unread .do_read_action").click();
+                }))
+                .insertAfter($("#title"));
             $("#feeds").attr("data-ttex-init", true);
         }
         $("#feeds li.status:not([data-ttex-loaded])").each(function() {
