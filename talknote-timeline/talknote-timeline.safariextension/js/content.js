@@ -1,6 +1,7 @@
 "use strict";
 
 var __ttex = {
+    entries : [],
     logoLinkPattern : /\/([^/]+)\/index\//,
     replace_logo_link : function(link) {
         var url = link.attr("href");
@@ -48,7 +49,27 @@ var __ttex = {
     nameLink : function(msg) {
         return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>"
     },
-    entries : []
+    dom : {
+        addMarkRead : function() {
+            $("<div class='__ttex_markread'></div>")
+                .append($("<a>mark all read</a>").click(function(event) {
+                    $("li.status.unread .do_read_action").click();
+                }))
+                .insertAfter($("#title"));
+        },
+        hideManyComments : function(commentBox) {
+            commentBox.addClass("__ttex_hide_more");
+            $("<div class='__ttex_read_more'></div>")
+                .insertBefore(commentBox)
+                .append(
+                    $("<a>...more comments...</a>")
+                        .click(function(event) {
+                            $(this).remove();
+                            commentBox.removeClass("__ttex_hide_more");
+                            return false;
+                }));
+        }
+    }
 };
 
 var __ttex_loop = function(loop_continue) {
@@ -59,12 +80,7 @@ var __ttex_loop = function(loop_continue) {
             // 初期化処理
             $("title, #title").text("TIMELINE @extention");
             __ttex.entries = [];
-            // 全て既読にするボタン
-            $("<div class='__ttex_markread'></div>")
-                .append($("<a>mark all read</a>").click(function(event) {
-                    $("li.status.unread .do_read_action").click();
-                }))
-                .insertAfter($("#title"));
+            __ttex.dom.addMarkRead();
 
             (new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
@@ -86,28 +102,19 @@ var __ttex_loop = function(loop_continue) {
                                         $.getJSON(restUrl, function(res) {
                                             if (res.status == 1) {
                                                 var msg = res.data.message
-                                                // ボックスを生成して投稿を読み込む
-                                                var loadBox = item.append("<div class='__ttex_readahead'></div>")
-                                                    .children(".__ttex_readahead")
+                                                // ボックスを生成して投稿を表示する
+                                                var loadBox = $("<div class='__ttex_readahead'></div>")
+                                                    .appendTo(item)
                                                     .html(
                                                         __ttex.nameLink(msg)
-                                                        +"<p>"+__ttex.insertTags(msg.message)+"</p><ul class='__ttex_comment'></ul>"
+                                                        +"<p>"+__ttex.insertTags(msg.message)+"</p>"
                                                     );
-                                                var commentBox = $("ul", loadBox);
-                                                // コメントが多い場合は隠す
+                                                var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+                                                // コメントが多い場合は隠す設定をする
                                                 if (msg.comment_array.length > 10) {
-                                                    commentBox.addClass("__ttex_hide_more");
-                                                    $("<div class='__ttex_read_more'></div>")
-                                                        .insertBefore(commentBox)
-                                                        .append(
-                                                            $("<a>...more comments...</a>")
-                                                                .click(function(event) {
-                                                                    $(this).remove();
-                                                                    commentBox.removeClass("__ttex_hide_more");
-                                                                    return false;
-                                                        }));
+                                                    __ttex.dom.hideManyComments(commentBox);
                                                 }
-                                                // コメントを読み込む
+                                                // コメントを表示する
                                                 $.each(msg.comment_array, function(i, comment) {
                                                     commentBox.append(
                                                         "<li>"
