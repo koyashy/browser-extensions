@@ -84,61 +84,60 @@ var __ttex_loop = function(loop_continue) {
 
             (new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
-                    if (mutation.type === "childList") {
-                        $.each(mutation.addedNodes, function(i, e) {
-                            $("li.status:not([data-ttex-loaded])", $(e).parent()).each(function() {
-                                // 1件の通知
-                                var item = $(this);
-                                // 投稿かコメントのみを対象にする
-                                $("a:contains('投稿'), a:contains('コメント')", item).each(function() {
-                                    try {
-                                        // API
-                                        var restUrl = __ttex.restUrl($(this).attr("href"));
-                                        // 既出の投稿であればスキップ
-                                        if ($.inArray(restUrl, __ttex.entries) !== -1) {
-                                            return true;
+                    $.each(mutation.addedNodes, function(i, e) {
+                        // 1件の通知
+                        var item = $(e);
+                        if (!item.is("li.status:not([data-ttex-loaded])")) {
+                            // 意図通りの要素でない場合はスキップ
+                            return true;
+                        }
+                        // 投稿かコメントのみを対象にする
+                        $("a:contains('投稿'), a:contains('コメント')", item).each(function() {
+                            try {
+                                // API
+                                var restUrl = __ttex.restUrl($(this).attr("href"));
+                                // 既出の投稿であればスキップ
+                                if ($.inArray(restUrl, __ttex.entries) !== -1) {
+                                    return true;
+                                }
+                                __ttex.entries.push(restUrl);
+                                $.getJSON(restUrl, function(res) {
+                                    if (res.status == 1) {
+                                        var msg = res.data.message
+                                        // ボックスを生成して投稿を表示する
+                                        var loadBox = $("<div class='__ttex_readahead'></div>")
+                                            .appendTo(item)
+                                            .html(
+                                                __ttex.nameLink(msg)
+                                                +"<p>"+__ttex.insertTags(msg.message)+"</p>"
+                                            );
+                                        var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+                                        // コメントが多い場合は隠す設定をする
+                                        if (msg.comment_array.length > 10) {
+                                            __ttex.dom.hideManyComments(commentBox);
                                         }
-                                        __ttex.entries.push(restUrl);
-                                        $.getJSON(restUrl, function(res) {
-                                            if (res.status == 1) {
-                                                var msg = res.data.message
-                                                // ボックスを生成して投稿を表示する
-                                                var loadBox = $("<div class='__ttex_readahead'></div>")
-                                                    .appendTo(item)
-                                                    .html(
-                                                        __ttex.nameLink(msg)
-                                                        +"<p>"+__ttex.insertTags(msg.message)+"</p>"
-                                                    );
-                                                var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
-                                                // コメントが多い場合は隠す設定をする
-                                                if (msg.comment_array.length > 10) {
-                                                    __ttex.dom.hideManyComments(commentBox);
-                                                }
-                                                // コメントを表示する
-                                                $.each(msg.comment_array, function(i, comment) {
-                                                    commentBox.append(
-                                                        "<li>"
-                                                        +__ttex.nameLink(comment)
-                                                        +"<p>"
-                                                        +__ttex.insertTags(comment.message_com)
-                                                        +"</p></li>"
-                                                    );
-                                                });
-                                            } else {
-                                                console.error(res.errors);
-                                            }
+                                        // コメントを表示する
+                                        $.each(msg.comment_array, function(i, comment) {
+                                            commentBox.append(
+                                                "<li>"
+                                                +__ttex.nameLink(comment)
+                                                +"<p>"
+                                                +__ttex.insertTags(comment.message_com)
+                                                +"</p></li>"
+                                            );
                                         });
-                                    } catch (e) {
-                                        console.error(e);
+                                    } else {
+                                        console.error(res.errors);
                                     }
                                 });
-                                $(item).attr("data-ttex-loaded", "");
-                            });
+                            } catch (e) {
+                                console.error(e);
+                            }
                         });
-                    }
+                        $(item).attr("data-ttex-loaded", "");
+                    });
                 });
             })).observe($('#feed_container').get(0), {childList: true});
-
             $("#feeds").attr("data-ttex-init", true);
         }
     }
