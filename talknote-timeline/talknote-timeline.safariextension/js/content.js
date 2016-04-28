@@ -16,6 +16,9 @@ var __ttex = {
     always : function() {
         return true;
     },
+    never : function() {
+        return false;
+    },
     brPattern : /\r\n|\n|\r/g,
     br : function(str) {
         return str.replace(this.brPattern, "<br />");
@@ -64,12 +67,14 @@ var __ttex_loop = function(loop_condition) {
                 .insertAfter($("#title"));
 
             (new MutationObserver(function(mutations) {
+                console.log(mutations);
                 mutations.forEach(function(mutation) {
                     if (mutation.type === "childList") {
                         $.each(mutation.addedNodes, function(i, e) {
                             $("li.status:not([data-ttex-loaded])", $(e).parent()).each(function() {
                                 // 1件の通知
                                 var item = $(this);
+                                console.log(item);
                                 // 投稿かコメントのみを対象にする
                                 var link = $("a:contains('投稿'), a:contains('コメント')", item)
                                     .each(function(){
@@ -139,9 +144,9 @@ var __ttex_loop = function(loop_condition) {
             $("#feeds").attr("data-ttex-init", true);
         }
     }
-    // if (loop_condition()) {
-    //     setTimeout(__ttex_loop, 1000, loop_condition);
-    // }
+    if (loop_condition()) {
+        setTimeout(__ttex_loop, 1000, loop_condition);
+    }
     // console.timeEnd("Timeline-extension loop");
 };
 
@@ -151,11 +156,11 @@ if (typeof chrome !== "undefined") {
         function(message, sender, sendResponse) {
             if (message.event == "onNewsPage") {
                 // console.log(message);
-                setTimeout(__ttex_loop, 500, __ttex.onNewsPage.bind(__ttex));
+                __ttex_loop(__ttex.never.bind(__ttex));
             }
         });
-    __ttex_loop(__ttex.onNewsPage.bind(__ttex));
+    __ttex_loop(__ttex.never.bind(__ttex));
 } else if (typeof safari !== "undefined") {
     // console.log(safari);
-    setTimeout(__ttex_loop, 500, __ttex.always.bind(__ttex));
+    __ttex_loop(__ttex.always.bind(__ttex));
 }
