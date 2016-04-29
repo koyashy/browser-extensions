@@ -14,7 +14,8 @@
     "phantomjs-prebuilt": "^2.1.5"
   },
   "scripts": {
-    "test": "karma start --single-run --browsers PhantomJS"
+    "test": "karma start --single-run --browsers PhantomJS",
+    "ct": "karma start --browsers PhantomJS"
   },
   "author": "",
   "license": "BSD-3-Clause"
