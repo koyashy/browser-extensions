@@ -3,17 +3,19 @@
 var ttex = ttex || {};
 
 ttex.App = {};
-ttex.App.main = function() {
-    if (!this.onNews() || ttex.NoticeContainer.ready()) {
-        return;
-    }
+ttex.App.run = function() {
     ttex.Title.replace();
     ttex.MarkRead.add();
     ttex.NoticeContainer.initialize();
 };
-ttex.App.newsUrlPattern = /^\/[^/]+\/news\/($|\?|#)/;
-ttex.App.onNews = function() {
-    return this.newsUrlPattern.test(location.pathname);
+ttex.App.newsUrlPattern = /\/[^/]+\/news\/($|\?|#)/;
+ttex.App.onNews = function(url) {
+    return this.newsUrlPattern.test(url);
+};
+ttex.App.shouldRun = function() {
+    if (this.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
+        this.run();
+    }
 };
 
 ttex.NoticeContainer = {};
@@ -55,36 +57,32 @@ ttex.Notice = function(node) {
 };
 ttex.Notice.prototype.load = function() {
     var self = this;
-    $("a:contains('投稿'), a:contains('コメント')", this.node).each(function() {
-        try {
-            var postUrl = $(this).attr("href");
-            var restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
-            ttex.NoticeContainer.unique(restUrl, function() {
-                ttex.TalknoteAPI.getPost(restUrl, function(msg) {
-                    var loadBox = $("<div class='__ttex_readahead'></div>")
-                        .html(
-                            ttex.NoticeHtml.nameLink(msg)
-                            +"<p>"+ttex.NoticeHtml.insertTags(msg.message)+"</p>"
-                        );
-                    var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
-                    if (msg.comment_array.length > 10) {
-                        ttex.NoticeHtml.hideManyComments(commentBox);
-                    }
-                    $.each(msg.comment_array, function(i, comment) {
-                        commentBox.append(
-                            "<li>"
-                            +ttex.NoticeHtml.nameLink(comment)
-                            +"<p>"
-                            +ttex.NoticeHtml.insertTags(comment.message_com)
-                            +"</p></li>"
-                        );
-                    });
-                    loadBox.appendTo(self.node);
+    $("a:contains('投稿'), a:contains('コメント')", self.node).each(function() {
+        var postUrl = $(this).attr("href");
+        var restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
+        ttex.NoticeContainer.unique(restUrl, function() {
+            ttex.TalknoteAPI.getPost(restUrl, function(msg) {
+                var loadBox = $("<div class='__ttex_readahead'></div>")
+                    .html(
+                        ttex.NoticeHtml.nameLink(msg)
+                        +"<p>"+ttex.NoticeHtml.insertTags(msg.message)+"</p>"
+                    );
+                var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+                if (msg.comment_array.length > 10) {
+                    ttex.NoticeHtml.hideManyComments(commentBox);
+                }
+                $.each(msg.comment_array, function(i, comment) {
+                    commentBox.append(
+                        "<li>"
+                        +ttex.NoticeHtml.nameLink(comment)
+                        +"<p>"
+                        +ttex.NoticeHtml.insertTags(comment.message_com)
+                        +"</p></li>"
+                    );
                 });
+                loadBox.appendTo(self.node);
             });
-        } catch (e) {
-            console.error(e);
-        }
+        });
     });
 };
 
@@ -119,7 +117,7 @@ ttex.NoticeHtml.hideManyComments = function(commentBox) {
 }
 
 ttex.HomeLink = {};
-ttex.HomeLink.pattern = /^\/([^/]+)\/index\/$/;
+ttex.HomeLink.pattern = /^\/([^/]+)\/index\/.*/;
 ttex.HomeLink.replace = function() {
     var link = ttex.Html.homeLink();
     var url = link.attr("href");
@@ -135,7 +133,7 @@ ttex.MarkRead.add = function() {
         .append($("<a>mark all read</a>").click(function(event) {
             $("li.status.unread .do_read_action").click();
         }))
-        .appendTo(ttex.Html.markReadTarget());
+        .appendTo(ttex.Html.markReadBox());
 };
 
 ttex.Title = {};
@@ -175,7 +173,7 @@ ttex.Html.homeLink = function() {
 ttex.Html.title = function() {
     return $("title, #title");
 };
-ttex.Html.markReadTarget = function() {
+ttex.Html.markReadBox = function() {
     return $("#title").parent();
 };
 ttex.Html.container = function() {
@@ -188,17 +186,26 @@ ttex.Chrome.launch = function() {
     chrome.runtime.onMessage.addListener(
         function(message, sender, sendResponse) {
             if (message.event == "moveToNewsPage") {
-                ttex.App.main();
+                ttex.App.run();
             }
         });
-    ttex.App.main();
+    ttex.App.shouldRun();
+};
+ttex.Chrome.background = function() {
+    chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
+        if (ttex.App.onNews(details.url)) {
+            chrome.tabs.sendMessage(details.tabId, {event: "moveToNewsPage", data: details});
+        }
+    }, {url: [
+        {hostEquals: "company.talknote.com"}
+    ]});
 };
 
 ttex.Safari = {};
 ttex.Safari.launch = function() {
     ttex.HomeLink.replace();
     var loop = function() {
-        ttex.App.main();
+        ttex.App.shouldRun();
         setTimeout(loop, 1000);
     };
     loop();
