@@ -50,7 +50,7 @@ ttex.NoticeContainer._callNotice = function(mutations) {
                 var notice = new ttex.Notice($(node));
                 notice.load();
             } catch (e) {
-                console.error(e);
+                console.error("Failed to process Notice", e);
             }
         });
     });
@@ -174,7 +174,7 @@ ttex.TalknoteAPI.getPost = function(url, callback) {
         if (res.status == 1) {
             callback(res.data.message);
         } else {
-            console.error(res.errors);
+            console.error("Failed to get post", url, res);
         }
     });
 };
