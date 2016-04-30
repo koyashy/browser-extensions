@@ -13,6 +13,8 @@ Talknote「お知らせ」（[URL](https://company.talknote.com/*/news/)）に�
 [Chrome用拡張機能ファイル](https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/latest/talknote-timeline.safariextension.crx)をダウンロードし、Chromeの拡張機能ページへドラッグ＆ドロップします。
 
 # 開発
+[実装](implement.md)
+
 ## Safariでの開発
 [公式ドキュメント](https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html)
 
