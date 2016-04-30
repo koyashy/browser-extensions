@@ -4,17 +4,24 @@ var ttex = ttex || {};
 
 ttex.App = {};
 ttex.App.run = function() {
-    ttex.Title.replace();
-    ttex.MarkRead.add();
     ttex.NoticeContainer.initialize();
-};
-ttex.App.newsUrlPattern = /\/[^/]+\/news\/($|\?|#)/;
-ttex.App.onNews = function(url) {
-    return this.newsUrlPattern.test(url);
 };
 ttex.App.shouldRun = function() {
     if (this.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
         this.run();
+    }
+};
+ttex.App.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
+ttex.App.onNews = function(url) {
+    return this.NEWS_URL_PATTERN.test(url);
+};
+ttex.App.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
+ttex.App.homeLink = function() {
+    var link = ttex.Html.homeLink();
+    var url = link.attr("href");
+    if (this.HOMELINK_PATTERN.test(url)) {
+        var newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
+        link.attr("href", newsUrl);
     }
 };
 
@@ -22,10 +29,12 @@ ttex.NoticeContainer = {};
 ttex.NoticeContainer.ready = function() {
     return !!ttex.Html.container().attr("data-ttex-init");
 };
-ttex.NoticeContainer.markReady = function() {
+ttex.NoticeContainer.initComplete = function() {
     ttex.Html.container().attr("data-ttex-init", true);
 };
 ttex.NoticeContainer.initialize = function() {
+    this.title();
+    this.markRead();
     this.entries = [];
     (new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -39,7 +48,7 @@ ttex.NoticeContainer.initialize = function() {
             });
         });
     })).observe(ttex.Html.container().get(0), {childList: true});
-    this.markReady();
+    this.initComplete();
 };
 ttex.NoticeContainer.unique = function(url, callback) {
     if ($.inArray(url, this.entries) !== -1) {
@@ -47,6 +56,16 @@ ttex.NoticeContainer.unique = function(url, callback) {
     }
     this.entries.push(url);
     callback(url);
+};
+ttex.NoticeContainer.title = function() {
+    ttex.Html.title().text("TIMELINE @extention");
+};
+ttex.NoticeContainer.markRead = function() {
+    $("<div class='__ttex_markread'></div>")
+        .append($("<a>mark all read</a>").click(function(event) {
+            $("li.status.unread .do_read_action").click();
+        }))
+        .appendTo(ttex.Html.markReadBox());
 };
 
 ttex.Notice = function(node) {
@@ -87,13 +106,13 @@ ttex.Notice.prototype.load = function() {
 };
 
 ttex.NoticeHtml = {};
-ttex.NoticeHtml.brPattern = /\r\n|\n|\r/g;
+ttex.NoticeHtml.BR_PATTERN = /\r\n|\n|\r/g;
 ttex.NoticeHtml.br = function(str) {
-    return str.replace(this.brPattern, "<br />");
+    return str.replace(this.BR_PATTERN, "<br />");
 };
-ttex.NoticeHtml.hrefPattern = /https?:\/\/\S+/g;
+ttex.NoticeHtml.HREF_PATTERN = /https?:\/\/\S+/g;
 ttex.NoticeHtml.href = function(str) {
-    return str.replace(this.hrefPattern, "<a href='$&'>$&</a>");
+    return str.replace(this.HREF_PATTERN, "<a href='$&'>$&</a>");
 };
 ttex.NoticeHtml.insertTags = function(str) {
     str = this.href(str);
@@ -116,42 +135,17 @@ ttex.NoticeHtml.hideManyComments = function(commentBox) {
         }));
 }
 
-ttex.HomeLink = {};
-ttex.HomeLink.pattern = /^\/([^/]+)\/index\/.*/;
-ttex.HomeLink.replace = function() {
-    var link = ttex.Html.homeLink();
-    var url = link.attr("href");
-    if (this.pattern.test(url)) {
-        var newsUrl = url.replace(this.pattern, "/$1/news/");
-        link.attr("href", newsUrl);
-    }
-};
-
-ttex.MarkRead = {};
-ttex.MarkRead.add = function() {
-    $("<div class='__ttex_markread'></div>")
-        .append($("<a>mark all read</a>").click(function(event) {
-            $("li.status.unread .do_read_action").click();
-        }))
-        .appendTo(ttex.Html.markReadBox());
-};
-
-ttex.Title = {};
-ttex.Title.replace = function() {
-    ttex.Html.title().text("TIMELINE @extention");
-};
-
 ttex.TalknoteAPI = {};
-ttex.TalknoteAPI.groupPostPattern = /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
-ttex.TalknoteAPI.publicPostPattern = /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
+ttex.TalknoteAPI.GROUP_POST_PATTERN = /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
+ttex.TalknoteAPI.PUBLIC_POST_PATTERN = /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
 ttex.TalknoteAPI.toRestUrl = function(url) {
     // グループへの投稿の場合
-    if (this.groupPostPattern.test(url)) {
-        return url.replace(this.groupPostPattern, "/$1/rest/group/$2/$3");
+    if (this.GROUP_POST_PATTERN.test(url)) {
+        return url.replace(this.GROUP_POST_PATTERN, "/$1/rest/group/$2/$3");
     }
     // 全社投稿の場合
-    if (this.publicPostPattern.test(url)) {
-        return url.replace(this.publicPostPattern, "/$1/rest/timeline/$2");
+    if (this.PUBLIC_POST_PATTERN.test(url)) {
+        return url.replace(this.PUBLIC_POST_PATTERN, "/$1/rest/timeline/$2");
     }
     throw new Error("Unknown URL pattern");
 };
@@ -182,7 +176,7 @@ ttex.Html.container = function() {
 
 ttex.Chrome = {};
 ttex.Chrome.launch = function() {
-    ttex.HomeLink.replace();
+    ttex.App.homeLink();
     chrome.runtime.onMessage.addListener(
         function(message, sender, sendResponse) {
             if (message.event == "moveToNewsPage") {
@@ -203,7 +197,7 @@ ttex.Chrome.background = function() {
 
 ttex.Safari = {};
 ttex.Safari.launch = function() {
-    ttex.HomeLink.replace();
+    ttex.App.homeLink();
     var loop = function() {
         ttex.App.shouldRun();
         setTimeout(loop, 1000);
