@@ -50,12 +50,12 @@ ttex.NoticeContainer.initialize = function() {
     })).observe(ttex.Html.container().get(0), {childList: true});
     this.initComplete();
 };
-ttex.NoticeContainer.unique = function(url, callback) {
-    if ($.inArray(url, this.entries) !== -1) {
+ttex.NoticeContainer.unique = function(uniqueKey, callback) {
+    if ($.inArray(uniqueKey, this.entries) !== -1) {
         return;
     }
-    this.entries.push(url);
-    callback(url);
+    this.entries.push(uniqueKey);
+    callback();
 };
 ttex.NoticeContainer.title = function() {
     ttex.Html.title().text("TIMELINE @extention");
@@ -83,19 +83,19 @@ ttex.Notice.prototype.load = function() {
             ttex.TalknoteAPI.getPost(restUrl, function(msg) {
                 var loadBox = $("<div class='__ttex_readahead'></div>")
                     .html(
-                        ttex.NoticeHtml.nameLink(msg)
-                        +"<p>"+ttex.NoticeHtml.insertTags(msg.message)+"</p>"
+                        self.nameLink(msg)
+                        +"<p>"+self.insertTags(msg.message)+"</p>"
                     );
                 var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
                 if (msg.comment_array.length > 10) {
-                    ttex.NoticeHtml.hideManyComments(commentBox);
+                    self.hideManyComments(commentBox);
                 }
                 $.each(msg.comment_array, function(i, comment) {
                     commentBox.append(
                         "<li>"
-                        +ttex.NoticeHtml.nameLink(comment)
+                        +self.nameLink(comment)
                         +"<p>"
-                        +ttex.NoticeHtml.insertTags(comment.message_com)
+                        +self.insertTags(comment.message_com)
                         +"</p></li>"
                     );
                 });
@@ -104,25 +104,23 @@ ttex.Notice.prototype.load = function() {
         });
     });
 };
-
-ttex.NoticeHtml = {};
-ttex.NoticeHtml.BR_PATTERN = /\r\n|\n|\r/g;
-ttex.NoticeHtml.br = function(str) {
+ttex.Notice.prototype.BR_PATTERN = /\r\n|\n|\r/g;
+ttex.Notice.prototype.br = function(str) {
     return str.replace(this.BR_PATTERN, "<br />");
 };
-ttex.NoticeHtml.HREF_PATTERN = /https?:\/\/\S+/g;
-ttex.NoticeHtml.href = function(str) {
+ttex.Notice.prototype.HREF_PATTERN = /https?:\/\/\S+/g;
+ttex.Notice.prototype.href = function(str) {
     return str.replace(this.HREF_PATTERN, "<a href='$&'>$&</a>");
 };
-ttex.NoticeHtml.insertTags = function(str) {
+ttex.Notice.prototype.insertTags = function(str) {
     str = this.href(str);
     str = this.br(str);
     return str;
 };
-ttex.NoticeHtml.nameLink = function(msg) {
-    return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>"
+ttex.Notice.prototype.nameLink = function(msg) {
+    return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>";
 };
-ttex.NoticeHtml.hideManyComments = function(commentBox) {
+ttex.Notice.prototype.hideManyComments = function(commentBox) {
     commentBox.addClass("__ttex_hide_more");
     $("<div class='__ttex_read_more'></div>")
         .insertBefore(commentBox)
@@ -136,8 +134,8 @@ ttex.NoticeHtml.hideManyComments = function(commentBox) {
 }
 
 ttex.TalknoteAPI = {};
-ttex.TalknoteAPI.GROUP_POST_PATTERN = /\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
-ttex.TalknoteAPI.PUBLIC_POST_PATTERN = /\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
+ttex.TalknoteAPI.GROUP_POST_PATTERN = /^\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
+ttex.TalknoteAPI.PUBLIC_POST_PATTERN = /^\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
 ttex.TalknoteAPI.toRestUrl = function(url) {
     // グループへの投稿の場合
     if (this.GROUP_POST_PATTERN.test(url)) {
@@ -152,8 +150,7 @@ ttex.TalknoteAPI.toRestUrl = function(url) {
 ttex.TalknoteAPI.getPost = function(url, callback) {
     $.getJSON(url, function(res) {
         if (res.status == 1) {
-            var msg = res.data.message
-            callback(msg);
+            callback(res.data.message);
         } else {
             console.error(res.errors);
         }
