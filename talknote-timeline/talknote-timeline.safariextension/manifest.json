@@ -11,7 +11,11 @@
     ],
     "background": {
         "persistent": false,
-        "scripts": ["js/background-chrome.js"]
+        "scripts": [
+            "js/jquery-2.2.1.min.js",
+            "js/lib/ttex.js",
+            "js/background-chrome.js"
+        ]
     },
 
     "content_scripts": [{
@@ -19,7 +23,8 @@
         "css": ["css/style.css"],
         "js": [
             "js/jquery-2.2.1.min.js",
-            "js/content.js"
+            "js/lib/ttex.js",
+            "js/content-chrome.js"
         ],
         "run_at": "document_end"
     }],
