@@ -35,34 +35,36 @@ ttex.App.homeLink = function() {
  */
 ttex.NoticeContainer = {};
 ttex.NoticeContainer.init = function() {
-    this.title();
-    this.markRead();
+    this._title();
+    this._markRead();
     this.entries = [];
     // 通知がボックスに追加されたことをフックする
-    (new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            $.each(mutation.addedNodes, function(i, node) {
-                try {
-                    var notice = new ttex.Notice(node);
-                    notice.load();
-                } catch (e) {
-                    console.error(e);
-                }
-            });
+    (new MutationObserver(this._callback))
+        .observe(ttex.Html.container().get(0), {childList: true});
+    this._initComplete();
+};
+ttex.NoticeContainer._callback = function(mutations) {
+    mutations.forEach(function(mutation) {
+        $.each(mutation.addedNodes, function(i, node) {
+            try {
+                var notice = new ttex.Notice($(node));
+                notice.load();
+            } catch (e) {
+                console.error(e);
+            }
         });
-    })).observe(ttex.Html.container().get(0), {childList: true});
-    this.initComplete();
+    });
 };
 ttex.NoticeContainer.ready = function() {
     return !!ttex.Html.container().attr("data-ttex-init");
 };
-ttex.NoticeContainer.initComplete = function() {
+ttex.NoticeContainer._initComplete = function() {
     ttex.Html.container().attr("data-ttex-init", true);
 };
-ttex.NoticeContainer.title = function() {
+ttex.NoticeContainer._title = function() {
     ttex.Html.title().text("TIMELINE @extention");
 };
-ttex.NoticeContainer.markRead = function() {
+ttex.NoticeContainer._markRead = function() {
     $("<div class='__ttex_markread'></div>")
         .append($("<a>mark all read</a>").click(function(event) {
             $("li.status.unread .do_read_action").click();
@@ -81,8 +83,8 @@ ttex.NoticeContainer.unique = function(uniqueKey, callback) {
  * ttex.Notice
  */
 ttex.Notice = function(node) {
-    this.node = $(node);
-    if (!this.node.is("li.status:not([data-ttex-loaded])")) {
+    this.node = node;
+    if (!this.node.is("li.status")) {
         throw new Error("Unexpected node");
     }
 };
@@ -105,7 +107,7 @@ ttex.Notice.prototype.load = function() {
                     self.hideManyComments(commentBox);
                 }
                 // コメントを表示する
-                $.each(msg.comment_array, function(i, comment) {
+                msg.comment_array.forEach(function(comment) {
                     commentBox.append(
                         "<li>"+self.nameLink(comment)
                         +"<p>"+self.insertTags(comment.message_com)+"</p></li>"
