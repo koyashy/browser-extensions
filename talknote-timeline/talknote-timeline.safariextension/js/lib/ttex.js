@@ -37,7 +37,7 @@ ttex.NoticeContainer = {};
 ttex.NoticeContainer.init = function() {
     this._title();
     this._markRead();
-    this.entries = [];
+    this._resetEntries();
     // 通知がボックスに追加されたことをフックする
     (new MutationObserver(this._callNotice))
         .observe(ttex.Html.container().get(0), {childList: true});
@@ -71,11 +71,14 @@ ttex.NoticeContainer._markRead = function() {
         }))
         .appendTo(ttex.Html.markReadBox());
 };
+ttex.NoticeContainer._resetEntries = function() {
+    this._entries = [];
+};
 ttex.NoticeContainer.uniqueCall = function(uniqueKey, callback) {
-    if ($.inArray(uniqueKey, this.entries) !== -1) {
+    if ($.inArray(uniqueKey, this._entries) !== -1) {
         return;
     }
-    this.entries.push(uniqueKey);
+    this._entries.push(uniqueKey);
     callback();
 };
 

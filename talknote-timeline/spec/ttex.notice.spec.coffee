@@ -2,7 +2,7 @@ describe 'ttex.Notice', ->
 
     describe 'load()', ->
         beforeEach ->
-            ttex.NoticeContainer.entries = []
+            ttex.NoticeContainer._resetEntries()
             this.href1 = '/abc.com/group/103306/msg/1111111/ntc/9693976#last_comment'
             this.href2 = '/abc.com/group/103306/msg/2222222/ntc/9693976#last_comment'
             this.li = (href) -> $("

@@ -19,7 +19,7 @@ describe 'ttex.TalknoteAPI', ->
         it 'get JSON and callback', ->
             spyOn($, 'getJSON').and.callFake( (url, getJsonCallback) ->
                     getJsonCallback({status : 1, data : {message: 'msg'}}) )
-            getPostCallback = jasmine.createSpy('getPostCallback');
+            getPostCallback = jasmine.createSpy 'getPostCallback'
             ttex.TalknoteAPI.getPost('/abc.com/dummy', getPostCallback)
             expect($.getJSON).toHaveBeenCalledWith('/abc.com/dummy', jasmine.any(Function))
             expect(getPostCallback).toHaveBeenCalledWith('msg')
@@ -27,7 +27,7 @@ describe 'ttex.TalknoteAPI', ->
         it 'get JSON bad status and dont callback', ->
             spyOn($, 'getJSON').and.callFake( (url, getJsonCallback) ->
                     getJsonCallback({status : 100, data : {message: 'msg'}}) )
-            getPostCallback = jasmine.createSpy('getPostCallback');
+            getPostCallback = jasmine.createSpy 'getPostCallback'
             spyOn(console, 'error')
             ttex.TalknoteAPI.getPost('/abc.com/dummy', getPostCallback)
             expect($.getJSON).toHaveBeenCalledWith('/abc.com/dummy', jasmine.any(Function))
