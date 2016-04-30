@@ -4,7 +4,7 @@ var ttex = ttex || {};
 
 ttex.App = {};
 ttex.App.run = function() {
-    ttex.NoticeContainer.initialize();
+    ttex.NoticeContainer.init();
 };
 ttex.App.shouldRun = function() {
     if (this.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
@@ -26,13 +26,7 @@ ttex.App.homeLink = function() {
 };
 
 ttex.NoticeContainer = {};
-ttex.NoticeContainer.ready = function() {
-    return !!ttex.Html.container().attr("data-ttex-init");
-};
-ttex.NoticeContainer.initComplete = function() {
-    ttex.Html.container().attr("data-ttex-init", true);
-};
-ttex.NoticeContainer.initialize = function() {
+ttex.NoticeContainer.init = function() {
     this.title();
     this.markRead();
     this.entries = [];
@@ -50,12 +44,11 @@ ttex.NoticeContainer.initialize = function() {
     })).observe(ttex.Html.container().get(0), {childList: true});
     this.initComplete();
 };
-ttex.NoticeContainer.unique = function(uniqueKey, callback) {
-    if ($.inArray(uniqueKey, this.entries) !== -1) {
-        return;
-    }
-    this.entries.push(uniqueKey);
-    callback();
+ttex.NoticeContainer.ready = function() {
+    return !!ttex.Html.container().attr("data-ttex-init");
+};
+ttex.NoticeContainer.initComplete = function() {
+    ttex.Html.container().attr("data-ttex-init", true);
 };
 ttex.NoticeContainer.title = function() {
     ttex.Html.title().text("TIMELINE @extention");
@@ -66,6 +59,13 @@ ttex.NoticeContainer.markRead = function() {
             $("li.status.unread .do_read_action").click();
         }))
         .appendTo(ttex.Html.markReadBox());
+};
+ttex.NoticeContainer.unique = function(uniqueKey, callback) {
+    if ($.inArray(uniqueKey, this.entries) !== -1) {
+        return;
+    }
+    this.entries.push(uniqueKey);
+    callback();
 };
 
 ttex.Notice = function(node) {
