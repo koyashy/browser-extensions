@@ -39,11 +39,11 @@ ttex.NoticeContainer.init = function() {
     this._markRead();
     this.entries = [];
     // 通知がボックスに追加されたことをフックする
-    (new MutationObserver(this._callback))
+    (new MutationObserver(this._callNotice))
         .observe(ttex.Html.container().get(0), {childList: true});
     this._initComplete();
 };
-ttex.NoticeContainer._callback = function(mutations) {
+ttex.NoticeContainer._callNotice = function(mutations) {
     mutations.forEach(function(mutation) {
         $.each(mutation.addedNodes, function(i, node) {
             try {
@@ -71,7 +71,7 @@ ttex.NoticeContainer._markRead = function() {
         }))
         .appendTo(ttex.Html.markReadBox());
 };
-ttex.NoticeContainer.unique = function(uniqueKey, callback) {
+ttex.NoticeContainer.uniqueCall = function(uniqueKey, callback) {
     if ($.inArray(uniqueKey, this.entries) !== -1) {
         return;
     }
@@ -96,45 +96,50 @@ ttex.Notice.prototype.load = function() {
         var postUrl = $(this).attr("href");
         var restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
         // 既出の投稿であればスキップ
-        ttex.NoticeContainer.unique(restUrl, function() {
+        ttex.NoticeContainer.uniqueCall(restUrl, function() {
             ttex.TalknoteAPI.getPost(restUrl, function(msg) {
-                // ボックスを生成して投稿を表示する
-                var loadBox = $("<div class='__ttex_readahead'></div>")
-                    .html(self.nameLink(msg)+"<p>"+self.insertTags(msg.message)+"</p>");
-                var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
-                // コメントが多い場合は隠す設定をする
-                if (msg.comment_array.length > 10) {
-                    self.hideManyComments(commentBox);
-                }
-                // コメントを表示する
-                msg.comment_array.forEach(function(comment) {
-                    commentBox.append(
-                        "<li>"+self.nameLink(comment)
-                        +"<p>"+self.insertTags(comment.message_com)+"</p></li>"
-                    );
-                });
-                loadBox.appendTo(self.node);
+                self._expandPost(msg)
             });
         });
     });
 };
+ttex.Notice.prototype._expandPost = function(msg) {
+    // this退避
+    var self = this;
+    // ボックスを生成して投稿を表示する
+    var loadBox = $("<div class='__ttex_readahead'></div>")
+        .append(self._nameLink(msg)+"<p>"+self._insertTags(msg.message)+"</p>");
+    var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+    // コメントが多い場合は隠す設定をする
+    if (msg.comment_array.length > 10) {
+        self._hideManyComments(commentBox);
+    }
+    // コメントを表示する
+    msg.comment_array.forEach(function(comment) {
+        commentBox.append(
+            "<li>"+self._nameLink(comment)
+            +"<p>"+self._insertTags(comment.message_com)+"</p></li>"
+        );
+    });
+    loadBox.appendTo(self.node);
+};
 ttex.Notice.prototype.BR_PATTERN = /\r\n|\n|\r/g;
-ttex.Notice.prototype.br = function(str) {
+ttex.Notice.prototype._br = function(str) {
     return str.replace(this.BR_PATTERN, "<br />");
 };
 ttex.Notice.prototype.HREF_PATTERN = /https?:\/\/\S+/g;
-ttex.Notice.prototype.href = function(str) {
+ttex.Notice.prototype._href = function(str) {
     return str.replace(this.HREF_PATTERN, "<a href='$&'>$&</a>");
 };
-ttex.Notice.prototype.insertTags = function(str) {
-    str = this.href(str);
-    str = this.br(str);
+ttex.Notice.prototype._insertTags = function(str) {
+    str = this._href(str);
+    str = this._br(str);
     return str;
 };
-ttex.Notice.prototype.nameLink = function(msg) {
+ttex.Notice.prototype._nameLink = function(msg) {
     return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>";
 };
-ttex.Notice.prototype.hideManyComments = function(commentBox) {
+ttex.Notice.prototype._hideManyComments = function(commentBox) {
     commentBox.addClass("__ttex_hide_more");
     $("<div class='__ttex_read_more'></div>")
         .insertBefore(commentBox)
@@ -145,7 +150,7 @@ ttex.Notice.prototype.hideManyComments = function(commentBox) {
                     commentBox.removeClass("__ttex_hide_more");
                     return false;
         }));
-}
+};
 
 /**
  * ttex.TalknoteAPI

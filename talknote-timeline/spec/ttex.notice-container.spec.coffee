@@ -15,13 +15,13 @@ describe 'ttex.NoticeContainer', ->
                 container.get(0), {childList: true})
             expect(ttex.NoticeContainer._initComplete).toHaveBeenCalled()
 
-    describe '_callback for MutationObserver', ->
+    describe '_callNotice for MutationObserver', ->
         it 'call Notice#load for each node', ->
             li = $('<li class="status"></li>')
             mutations = [{addedNodes : [li]}, {addedNodes : [li]}]
             spyOn(ttex.Notice.prototype, 'load')
-            ttex.NoticeContainer._callback(mutations)
-            expect(ttex.Notice.prototype.load.calls.count()).toEqual(2);
+            ttex.NoticeContainer._callNotice(mutations)
+            expect(ttex.Notice.prototype.load.calls.count()).toBe 2
 
     describe 'ready(), _initComplete()', ->
         it 'return true after _initComplete() called', ->
