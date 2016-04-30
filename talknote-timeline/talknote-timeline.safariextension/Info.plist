@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Akira Koyasu</string>
 	<key>Builder Version</key>
-	<string>11601.5.17.1</string>
+	<string>11601.6.14</string>
 	<key>CFBundleDisplayName</key>
 	<string>Talknote timeline extension</string>
 	<key>CFBundleIdentifier</key>
@@ -23,8 +23,7 @@
 			<key>End</key>
 			<array>
 				<string>js/jquery-2.2.1.min.js</string>
-				<string>js/lib/ttex.js</string>
-				<string>js/content-safari.js</string>
+				<string>js/content.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
@@ -39,7 +38,7 @@
 	<key>Description</key>
 	<string>This extension shows timeline in news page.</string>
 	<key>DeveloperIdentifier</key>
-	<string>0000000000</string>
+	<string>C2AGCLBW3A</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
