@@ -17,9 +17,6 @@ module.exports = (config) ->
     files: [
       'spec/lib/*.coffee',
       'talknote-timeline.safariextension/js/lib/*.js',
-      'talknote-timeline.safariextension/js/jquery-2.2.1.min.js',
-      'talknote-timeline.safariextension/js/background-chrome.js',
-      'talknote-timeline.safariextension/js/content.js',
       'spec/**/*.spec.coffee'
     ]
 

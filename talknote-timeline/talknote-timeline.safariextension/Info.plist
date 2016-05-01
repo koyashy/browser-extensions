@@ -22,8 +22,9 @@
 		<dict>
 			<key>End</key>
 			<array>
-				<string>js/jquery-2.2.1.min.js</string>
-				<string>js/content.js</string>
+				<string>js/lib/jquery-2.2.1.min.js</string>
+				<string>js/lib/ttex.js</string>
+				<string>js/content-safari.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
