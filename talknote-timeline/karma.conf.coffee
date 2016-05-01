@@ -30,18 +30,19 @@ module.exports = (config) ->
     # preprocess matching files before serving them to the browser
     # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-    #   'talknote-timeline.safariextension/**/*.js': ['babel']
+      'talknote-timeline.safariextension/**/*.js': ['babel']
       'spec/**/*.coffee': ['coffee']
+    }
+
+    coffeePreprocessor: {
+      options:
+        sourceMap: true
     }
 
     babelPreprocessor: {
       options:
         presets: ['es2015']
-        sourceMap: 'inline'
-      filename: (file) ->
-        file.originalPath.replace(/\.js$/, '.es5.js')
-      sourceFileName: (file) ->
-        file.originalPath
+        sourceMap: true
     }
 
     # test results reporter to use

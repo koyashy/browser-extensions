@@ -16,6 +16,9 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "phantomjs-prebuilt": "^2.1.7"
   },
+  "optionalDependencies": {
+    "karma-chrome-launcher": "^0.2.3"
+  },
   "scripts": {
     "test": "karma start --single-run",
     "ct": "karma start"
