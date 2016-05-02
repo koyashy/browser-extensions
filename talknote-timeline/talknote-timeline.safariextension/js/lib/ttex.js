@@ -34,53 +34,54 @@ ttex.App = new class {
 /**
  * ttex.NoticeContainer
  */
-ttex.NoticeContainer = {};
-ttex.NoticeContainer.init = function() {
-    this._title();
-    this._markRead();
-    this._resetEntries();
-    // 通知がボックスに追加されたことをフックする
-    (new MutationObserver(this._callNotice))
-        .observe(ttex.Html.container().get(0), {childList: true});
-    this._initComplete();
-};
-ttex.NoticeContainer._callNotice = function(mutations) {
-    mutations.forEach(function(mutation) {
-        $.each(mutation.addedNodes, function(i, node) {
-            try {
-                var notice = new ttex.Notice($(node));
-                notice.load();
-            } catch (e) {
-                console.error("Failed to process Notice", e);
-            }
-        });
-    });
-};
-ttex.NoticeContainer.ready = function() {
-    return !!ttex.Html.container().attr("data-ttex-init");
-};
-ttex.NoticeContainer._initComplete = function() {
-    ttex.Html.container().attr("data-ttex-init", true);
-};
-ttex.NoticeContainer._title = function() {
-    ttex.Html.title().text("TIMELINE @extention");
-};
-ttex.NoticeContainer._markRead = function() {
-    $("<div class='__ttex_markread'></div>")
-        .append($("<a>mark all read</a>").click(function(event) {
-            $("li.status.unread .do_read_action").click();
-        }))
-        .appendTo(ttex.Html.markReadBox());
-};
-ttex.NoticeContainer._resetEntries = function() {
-    this._entries = new Set();
-};
-ttex.NoticeContainer.uniqueCall = function(uniqueKey, callback) {
-    if (this._entries.has(uniqueKey)) {
-        return;
+ttex.NoticeContainer = new class {
+    init() {
+        this._title();
+        this._markRead();
+        this._resetEntries();
+        // 通知がボックスに追加されたことをフックする
+        (new MutationObserver(this._callNotice))
+            .observe(ttex.Html.container().get(0), {childList: true});
+        this._initComplete();
     }
-    this._entries.add(uniqueKey);
-    callback();
+    _callNotice(mutations) {
+        mutations.forEach((mutation) => {
+            $.each(mutation.addedNodes, (i, node) => {
+                try {
+                    var notice = new ttex.Notice($(node));
+                    notice.load();
+                } catch (e) {
+                    console.error("Failed to process Notice", e);
+                }
+            });
+        });
+    }
+    ready() {
+        return !!ttex.Html.container().attr("data-ttex-init");
+    }
+    _initComplete() {
+        ttex.Html.container().attr("data-ttex-init", true);
+    }
+    _title() {
+        ttex.Html.title().text("TIMELINE @extention");
+    }
+    _markRead() {
+        $("<div class='__ttex_markread'></div>")
+            .append($("<a>mark all read</a>").click((event) => {
+                $("li.status.unread .do_read_action").click();
+            }))
+            .appendTo(ttex.Html.markReadBox());
+    }
+    _resetEntries() {
+        this._entries = new Set();
+    }
+    uniqueCall(uniqueKey, callback) {
+        if (this._entries.has(uniqueKey)) {
+            return;
+        }
+        this._entries.add(uniqueKey);
+        callback();
+    }
 };
 
 /**
