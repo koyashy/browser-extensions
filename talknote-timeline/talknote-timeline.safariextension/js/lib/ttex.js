@@ -5,32 +5,31 @@ var ttex = ttex || {};
 /**
  * ttex.App
  */
-ttex.App = class App {
-    static initClass() {
-        App.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
-        App.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
+ttex.App = new class {
+    constructor() {
+        this.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
+        this.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
     }
-    static run() {
+    run() {
         ttex.NoticeContainer.init();
     }
-    static shouldRun() {
-        if (App.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
-            App.run();
+    shouldRun() {
+        if (this.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
+            this.run();
         }
     }
-    static onNews(url) {
-        return App.NEWS_URL_PATTERN.test(url);
+    onNews(url) {
+        return this.NEWS_URL_PATTERN.test(url);
     }
-    static homeLink() {
+    homeLink() {
         var link = ttex.Html.homeLink();
         var url = link.attr("href");
-        if (App.HOMELINK_PATTERN.test(url)) {
-            var newsUrl = url.replace(App.HOMELINK_PATTERN, "/$1/news/");
+        if (this.HOMELINK_PATTERN.test(url)) {
+            var newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
             link.attr("href", newsUrl);
         }
     }
-}
-ttex.App.initClass();
+};
 
 /**
  * ttex.NoticeContainer
