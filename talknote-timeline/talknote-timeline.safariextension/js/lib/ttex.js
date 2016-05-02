@@ -5,30 +5,32 @@ var ttex = ttex || {};
 /**
  * ttex.App
  */
-ttex.App = {};
-ttex.App.run = function() {
-    // console.time("Timeline-extension loop");
-    ttex.NoticeContainer.init();
-    // console.timeEnd("Timeline-extension loop");
-};
-ttex.App.shouldRun = function() {
-    if (this.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
-        this.run();
+ttex.App = class App {
+    static initClass() {
+        App.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
+        App.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
     }
-};
-ttex.App.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
-ttex.App.onNews = function(url) {
-    return this.NEWS_URL_PATTERN.test(url);
-};
-ttex.App.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
-ttex.App.homeLink = function() {
-    var link = ttex.Html.homeLink();
-    var url = link.attr("href");
-    if (this.HOMELINK_PATTERN.test(url)) {
-        var newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
-        link.attr("href", newsUrl);
+    static run() {
+        ttex.NoticeContainer.init();
     }
-};
+    static shouldRun() {
+        if (App.onNews(location.pathname) && !ttex.NoticeContainer.ready()) {
+            App.run();
+        }
+    }
+    static onNews(url) {
+        return App.NEWS_URL_PATTERN.test(url);
+    }
+    static homeLink() {
+        var link = ttex.Html.homeLink();
+        var url = link.attr("href");
+        if (App.HOMELINK_PATTERN.test(url)) {
+            var newsUrl = url.replace(App.HOMELINK_PATTERN, "/$1/news/");
+            link.attr("href", newsUrl);
+        }
+    }
+}
+ttex.App.initClass();
 
 /**
  * ttex.NoticeContainer
@@ -72,13 +74,13 @@ ttex.NoticeContainer._markRead = function() {
         .appendTo(ttex.Html.markReadBox());
 };
 ttex.NoticeContainer._resetEntries = function() {
-    this._entries = [];
+    this._entries = new Set();
 };
 ttex.NoticeContainer.uniqueCall = function(uniqueKey, callback) {
-    if ($.inArray(uniqueKey, this._entries) !== -1) {
+    if (this._entries.has(uniqueKey)) {
         return;
     }
-    this._entries.push(uniqueKey);
+    this._entries.add(uniqueKey);
     callback();
 };
 
