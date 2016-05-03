@@ -167,80 +167,86 @@ new class {
 /**
  * ttex.TalknoteAPI
  */
-ttex.TalknoteAPI = {};
-ttex.TalknoteAPI.GROUP_POST_PATTERN = /^\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
-ttex.TalknoteAPI.PUBLIC_POST_PATTERN = /^\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
-ttex.TalknoteAPI.toRestUrl = function(url) {
-    // グループへの投稿の場合
-    if (this.GROUP_POST_PATTERN.test(url)) {
-        return url.replace(this.GROUP_POST_PATTERN, "/$1/rest/group/$2/$3");
+ttex.TalknoteAPI = new class {
+    constructor() {
+        this.GROUP_POST_PATTERN = /^\/([^/]+)\/group\/([^/]+)\/msg\/([^/]+).*/;
+        this.PUBLIC_POST_PATTERN = /^\/([^/]+)\/user\/[^/]+\/msg\/([^/]+).*/;
     }
-    // 全社投稿の場合
-    if (this.PUBLIC_POST_PATTERN.test(url)) {
-        return url.replace(this.PUBLIC_POST_PATTERN, "/$1/rest/timeline/$2");
-    }
-    throw new Error("Unknown URL pattern");
-};
-ttex.TalknoteAPI.getPost = function(url, callback) {
-    $.getJSON(url, function(res) {
-        if (res.status == 1) {
-            callback(res.data.message);
-        } else {
-            console.error("Failed to get post", url, res);
+    toRestUrl(url) {
+        // グループへの投稿の場合
+        if (this.GROUP_POST_PATTERN.test(url)) {
+            return url.replace(this.GROUP_POST_PATTERN, "/$1/rest/group/$2/$3");
         }
-    });
+        // 全社投稿の場合
+        if (this.PUBLIC_POST_PATTERN.test(url)) {
+            return url.replace(this.PUBLIC_POST_PATTERN, "/$1/rest/timeline/$2");
+        }
+        throw new Error("Unknown URL pattern");
+    }
+    getPost(url, callback) {
+        $.getJSON(url, (res) => {
+            if (res.status == 1) {
+                callback(res.data.message);
+            } else {
+                console.error("Failed to get post", url, res);
+            }
+        });
+    }
 };
 
 /**
  * ttex.Html
  */
-ttex.Html = {};
-ttex.Html.homeLink = function() {
-    return $(".talknote_logo a");
-};
-ttex.Html.title = function() {
-    return $("title, #title");
-};
-ttex.Html.markReadBox = function() {
-    return $("#title").parent();
-};
-ttex.Html.container = function() {
-    return $('#feed_container');
+ttex.Html = new class {
+    homeLink() {
+        return $(".talknote_logo a");
+    }
+    title() {
+        return $("title, #title");
+    }
+    markReadBox() {
+        return $("#title").parent();
+    }
+    container() {
+        return $('#feed_container');
+    }
 };
 
 /**
  * ttex.Chrome
  */
-ttex.Chrome = {};
-ttex.Chrome.launch = function() {
-    ttex.App.homeLink();
-    chrome.runtime.onMessage.addListener(
-        function(message, sender, sendResponse) {
-            if (message.event == "moveToNewsPage") {
-                ttex.App.run();
+ttex.Chrome = new class {
+    launch() {
+        ttex.App.homeLink();
+        chrome.runtime.onMessage.addListener(
+            (message, sender, sendResponse) => {
+                if (message.event == "moveToNewsPage") {
+                    ttex.App.run();
+                }
+            });
+        ttex.App.shouldRun();
+    }
+    background() {
+        chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+            if (ttex.App.onNews(details.url)) {
+                chrome.tabs.sendMessage(details.tabId, {event: "moveToNewsPage", data: details});
             }
-        });
-    ttex.App.shouldRun();
-};
-ttex.Chrome.background = function() {
-    chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
-        if (ttex.App.onNews(details.url)) {
-            chrome.tabs.sendMessage(details.tabId, {event: "moveToNewsPage", data: details});
-        }
-    }, {url: [
-        {hostEquals: "company.talknote.com"}
-    ]});
+        }, {url: [
+            {hostEquals: "company.talknote.com"}
+        ]});
+    }
 };
 
 /**
  * ttex.Safari
  */
-ttex.Safari = {};
-ttex.Safari.launch = function() {
-    ttex.App.homeLink();
-    var loop = function() {
-        ttex.App.shouldRun();
-        setTimeout(loop, 1000);
-    };
-    loop();
+ttex.Safari = new class {
+    launch() {
+        ttex.App.homeLink();
+        var loop = () => {
+            ttex.App.shouldRun();
+            setTimeout(loop, 1000);
+        };
+        loop();
+    }
 };
