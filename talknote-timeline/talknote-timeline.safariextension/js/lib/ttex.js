@@ -34,7 +34,7 @@ ttex.App = new class {
 /**
  * ttex.NoticeContainer
  */
-ttex.NoticeContainer = new class {
+ttex.NoticeContainer = {
     init() {
         this._title();
         this._markRead();
@@ -43,7 +43,7 @@ ttex.NoticeContainer = new class {
         (new MutationObserver(this._callNotice))
             .observe(ttex.Html.container().get(0), {childList: true});
         this._initComplete();
-    }
+    },
     _callNotice(mutations) {
         mutations.forEach((mutation) => {
             $.each(mutation.addedNodes, (i, node) => {
@@ -55,26 +55,26 @@ ttex.NoticeContainer = new class {
                 }
             });
         });
-    }
+    },
     ready() {
         return !!ttex.Html.container().attr("data-ttex-init");
-    }
+    },
     _initComplete() {
         ttex.Html.container().attr("data-ttex-init", true);
-    }
+    },
     _title() {
         ttex.Html.title().text("TIMELINE @extention");
-    }
+    },
     _markRead() {
         $("<div class='__ttex_markread'></div>")
             .append($("<a>mark all read</a>").click((event) => {
                 $("li.status.unread .do_read_action").click();
             }))
             .appendTo(ttex.Html.markReadBox());
-    }
+    },
     _resetEntries() {
         this._entries = new Set();
-    }
+    },
     uniqueCall(uniqueKey, callback) {
         if (this._entries.has(uniqueKey)) {
             return;
@@ -197,16 +197,16 @@ ttex.TalknoteAPI = new class {
 /**
  * ttex.Html
  */
-ttex.Html = new class {
+ttex.Html = {
     homeLink() {
         return $(".talknote_logo a");
-    }
+    },
     title() {
         return $("title, #title");
-    }
+    },
     markReadBox() {
         return $("#title").parent();
-    }
+    },
     container() {
         return $('#feed_container');
     }
@@ -215,7 +215,7 @@ ttex.Html = new class {
 /**
  * ttex.Chrome
  */
-ttex.Chrome = new class {
+ttex.Chrome = {
     launch() {
         ttex.App.homeLink();
         chrome.runtime.onMessage.addListener(
@@ -225,7 +225,7 @@ ttex.Chrome = new class {
                 }
             });
         ttex.App.shouldRun();
-    }
+    },
     background() {
         chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
             if (ttex.App.onNews(details.url)) {
@@ -240,7 +240,7 @@ ttex.Chrome = new class {
 /**
  * ttex.Safari
  */
-ttex.Safari = new class {
+ttex.Safari = {
     launch() {
         ttex.App.homeLink();
         let loop = () => {
