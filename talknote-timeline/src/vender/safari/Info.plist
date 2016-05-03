@@ -22,8 +22,9 @@
 		<dict>
 			<key>End</key>
 			<array>
-				<string>js/lib/jquery-2.2.1.min.js</string>
-				<string>js/lib/ttex.js</string>
+				<string>lib/polyfill.js</string>
+				<string>lib/jquery-2.2.1.min.js</string>
+				<string>js/ttex.js</string>
 				<string>js/content-safari.js</string>
 			</array>
 		</dict>

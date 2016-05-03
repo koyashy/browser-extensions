@@ -2,3 +2,4 @@
 *.pem
 *.safariextz
 node_modules/
+build/
