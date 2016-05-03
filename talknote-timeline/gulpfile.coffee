@@ -5,35 +5,49 @@ uglify = require 'gulp-uglify'
 cleanCSS = require 'gulp-clean-css'
 runSequence = require 'run-sequence'
 
-BUILD_NAME = 'talknote-timeline.safariextension'
+path =
+    src:
+        safari: 'src/vender/safari/**'
+        chrome: 'src/vender/chrome/**'
+        lib: 'src/lib/**'
+        css: 'src/css/**'
+        js: 'src/js/**'
+    build:
+        safari: 'build/safari/talknote-timeline.safariextension'
+        chrome: 'build/chrome/talknote-timeline.safariextension'
 
 gulp.task 'clean', (cb) ->
     rimraf('./build', cb)
 
 gulp.task 'safari', () ->
-    gulp.src('src/vender/safari/**')
-        .pipe(gulp.dest("build/safari/#{BUILD_NAME}"))
-    gulp.src(['src/lib/**',
+    gulp.src(path.src.safari)
+        .pipe(gulp.dest(path.build.safari))
+    gulp.src([path.src.lib,
             'node_modules/babel-polyfill/dist/polyfill.js'])
-        .pipe(gulp.dest("build/safari/#{BUILD_NAME}/lib"))
-    gulp.src('src/css/**')
+        .pipe(gulp.dest("#{path.build.safari}/lib"))
+    gulp.src(path.src.css)
         .pipe(cleanCSS())
-        .pipe(gulp.dest("build/safari/#{BUILD_NAME}/css"))
-    gulp.src('src/js/**')
+        .pipe(gulp.dest("#{path.build.safari}/css"))
+    gulp.src(path.src.js)
         .pipe(babel(presets: ['es2015']))
         .pipe(uglify())
-        .pipe(gulp.dest("build/safari/#{BUILD_NAME}/js"))
+        .pipe(gulp.dest("#{path.build.safari}/js"))
 
 gulp.task 'chrome', () ->
-    gulp.src('src/vender/chrome/**')
-        .pipe(gulp.dest("build/chrome/#{BUILD_NAME}"))
-    gulp.src('src/lib/**')
-        .pipe(gulp.dest("build/chrome/#{BUILD_NAME}/lib"))
-    gulp.src('src/css/**')
+    gulp.src(path.src.chrome)
+        .pipe(gulp.dest(path.build.chrome))
+    gulp.src(path.src.lib)
+        .pipe(gulp.dest("#{path.build.chrome}/lib"))
+    gulp.src(path.src.css)
         .pipe(cleanCSS())
-        .pipe(gulp.dest("build/chrome/#{BUILD_NAME}/css"))
-    gulp.src('src/js/**')
-        .pipe(gulp.dest("build/chrome/#{BUILD_NAME}/js"))
+        .pipe(gulp.dest("#{path.build.chrome}/css"))
+    gulp.src(path.src.js)
+        .pipe(gulp.dest("#{path.build.chrome}/js"))
 
-gulp.task 'default', (cb) ->
+gulp.task 'watch', () ->
+    gulp.watch 'src/**', ['safari', 'chrome']
+
+gulp.task 'build', (cb) ->
     runSequence('clean', ['safari', 'chrome'], cb)
+
+gulp.task 'default', ['build']

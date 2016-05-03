@@ -28,7 +28,8 @@
   "scripts": {
     "test": "karma start --single-run",
     "ct": "karma start",
-    "build": "gulp"
+    "build": "gulp build",
+    "cb": "gulp watch"
   },
   "author": "",
   "license": "BSD-3-Clause"
