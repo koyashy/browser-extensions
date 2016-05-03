@@ -27,4 +27,26 @@ http://os0x.hatenablog.com/entry/20100610/1276119135
 参考
 http://liginc.co.jp/web/tool/browser/163575
 
+## テスト
+1度だけテストを実行します。
+```
+npm test
+```
+変更を監視してテストを実行します。
+```
+npm run ct
+```
+
+## ビルド
+```
+npm run build
+```
+
+- Safari用のディレクトリ： ```build/safari/talknote-timeline.safariextension```
+- Chrome用のディレクトリ： ```build/chrome/talknote-timeline.safariextension```
+
+それぞれのディレクトリを各ブラウザの拡張機能管理画面から読み込むことで、デバッグすることができます。
+
 ## 自動更新
+
+S3にホストしています。
