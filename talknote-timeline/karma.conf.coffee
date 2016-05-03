@@ -16,8 +16,8 @@ module.exports = (config) ->
     # list of files / patterns to load in the browser
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
-      'spec/lib/*.coffee',
-      'talknote-timeline.safariextension/js/lib/*.js',
+      'src/lib/*.js',
+      'src/js/*.js',
       'spec/**/*.spec.coffee'
     ]
 
@@ -30,7 +30,7 @@ module.exports = (config) ->
     # preprocess matching files before serving them to the browser
     # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'talknote-timeline.safariextension/**/*.js': ['babel']
+      'src/js/*.js': ['babel']
       'spec/**/*.coffee': ['coffee']
     }
 
