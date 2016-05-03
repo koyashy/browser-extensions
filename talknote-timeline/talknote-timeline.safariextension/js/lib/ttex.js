@@ -22,10 +22,10 @@ ttex.App = new class {
         return this.NEWS_URL_PATTERN.test(url);
     }
     homeLink() {
-        var link = ttex.Html.homeLink();
-        var url = link.attr("href");
+        let link = ttex.Html.homeLink();
+        let url = link.attr("href");
         if (this.HOMELINK_PATTERN.test(url)) {
-            var newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
+            let newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
             link.attr("href", newsUrl);
         }
     }
@@ -48,7 +48,7 @@ ttex.NoticeContainer = new class {
         mutations.forEach((mutation) => {
             $.each(mutation.addedNodes, (i, node) => {
                 try {
-                    var notice = new ttex.Notice($(node));
+                    let notice = new ttex.Notice($(node));
                     notice.load();
                 } catch (e) {
                     console.error("Failed to process Notice", e);
@@ -87,74 +87,81 @@ ttex.NoticeContainer = new class {
 /**
  * ttex.Notice
  */
-ttex.Notice = function(node) {
-    this.node = node;
-    if (!this.node.is("li.status")) {
-        throw new Error("Unexpected node");
+ttex.Notice = class {
+    constructor(node) {
+        this.node = node;
+        if (!this.node.is("li.status")) {
+            throw new Error("Unexpected node");
+        }
     }
-};
-ttex.Notice.prototype.load = function() {
-    // this退避
-    var self = this;
-    // 投稿かコメントのみを対象にする
-    $("a:contains('投稿'), a:contains('コメント')", self.node).each(function() {
-        var postUrl = $(this).attr("href");
-        var restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
-        // 既出の投稿であればスキップ
-        ttex.NoticeContainer.uniqueCall(restUrl, function() {
-            ttex.TalknoteAPI.getPost(restUrl, function(msg) {
-                self._expandPost(msg)
+    load() {
+        // 投稿かコメントのみを対象にする
+        $("a:contains('投稿'), a:contains('コメント')", this.node).each((i, e) => {
+            let postUrl = $(e).attr("href");
+            let restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
+            // 既出の投稿であればスキップ
+            ttex.NoticeContainer.uniqueCall(restUrl, () => {
+                ttex.TalknoteAPI.getPost(restUrl, (msg) => {
+                    this._expandPost(msg)
+                });
             });
         });
-    });
-};
-ttex.Notice.prototype._expandPost = function(msg) {
-    // this退避
-    var self = this;
-    // ボックスを生成して投稿を表示する
-    var loadBox = $("<div class='__ttex_readahead'></div>")
-        .append(self._nameLink(msg)+"<p>"+self._insertTags(msg.message)+"</p>");
-    var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
-    // コメントが多い場合は隠す設定をする
-    if (msg.comment_array.length > 10) {
-        self._hideManyComments(commentBox);
     }
-    // コメントを表示する
-    msg.comment_array.forEach(function(comment) {
-        commentBox.append(
-            "<li>"+self._nameLink(comment)
-            +"<p>"+self._insertTags(comment.message_com)+"</p></li>"
-        );
-    });
-    loadBox.appendTo(self.node);
+    _expandPost(msg) {
+        // ボックスを生成して投稿を表示する
+        var loadBox = $("<div class='__ttex_readahead'></div>")
+            .append(this.Companion._nameLink(msg)+"<p>"+this.Companion._insertTags(msg.message)+"</p>");
+        var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
+        // コメントが多い場合は隠す設定をする
+        if (msg.comment_array.length > 10) {
+            this.Companion._hideManyComments(commentBox);
+        }
+        // コメントを表示する
+        msg.comment_array.forEach((comment) => {
+            commentBox.append(
+                "<li>"+this.Companion._nameLink(comment)
+                +"<p>"+this.Companion._insertTags(comment.message_com)+"</p></li>"
+            );
+        });
+        loadBox.appendTo(this.node);
+    }
 };
-ttex.Notice.prototype.BR_PATTERN = /\r\n|\n|\r/g;
-ttex.Notice.prototype._br = function(str) {
-    return str.replace(this.BR_PATTERN, "<br />");
-};
-ttex.Notice.prototype.HREF_PATTERN = /https?:\/\/\S+/g;
-ttex.Notice.prototype._href = function(str) {
-    return str.replace(this.HREF_PATTERN, "<a href='$&'>$&</a>");
-};
-ttex.Notice.prototype._insertTags = function(str) {
-    str = this._href(str);
-    str = this._br(str);
-    return str;
-};
-ttex.Notice.prototype._nameLink = function(msg) {
-    return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>";
-};
-ttex.Notice.prototype._hideManyComments = function(commentBox) {
-    commentBox.addClass("__ttex_hide_more");
-    $("<div class='__ttex_read_more'></div>")
-        .insertBefore(commentBox)
-        .append(
-            $("<a>...more comments...</a>")
-                .click(function(event) {
-                    $(this).remove();
-                    commentBox.removeClass("__ttex_hide_more");
-                    return false;
-        }));
+
+/**
+ * ttex.Notice.Companion
+ */
+new class {
+    constructor() {
+        this.BR_PATTERN = /\r\n|\n|\r/g;
+        this.HREF_PATTERN = /https?:\/\/\S+/g;
+        ttex.Notice.prototype.Companion = this;
+    }
+    _br(str) {
+        return str.replace(this.BR_PATTERN, "<br />");
+    }
+    _href(str) {
+        return str.replace(this.HREF_PATTERN, "<a href='$&'>$&</a>");
+    }
+    _insertTags(str) {
+        str = this._href(str);
+        str = this._br(str);
+        return str;
+    }
+    _nameLink(msg) {
+        return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>";
+    }
+    _hideManyComments(commentBox) {
+        commentBox.addClass("__ttex_hide_more");
+        $("<div class='__ttex_read_more'></div>")
+            .insertBefore(commentBox)
+            .append(
+                $("<a>...more comments...</a>")
+                    .click((event) => {
+                        $(event.target).remove();
+                        commentBox.removeClass("__ttex_hide_more");
+                        return false;
+            }));
+    }
 };
 
 /**
