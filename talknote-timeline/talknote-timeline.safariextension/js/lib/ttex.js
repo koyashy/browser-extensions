@@ -110,7 +110,8 @@ ttex.Notice = class {
     _expandPost(msg) {
         // ボックスを生成して投稿を表示する
         var loadBox = $("<div class='__ttex_readahead'></div>")
-            .append(this.Companion._nameLink(msg)+"<p>"+this.Companion._insertTags(msg.message)+"</p>");
+            .append(`${this.Companion._nameLink(msg)}`
+                +`<p>${this.Companion._insertTags(msg.message)}</p>`);
         var commentBox = $("<ul class='__ttex_comment'></ul>").appendTo(loadBox);
         // コメントが多い場合は隠す設定をする
         if (msg.comment_array.length > 10) {
@@ -119,8 +120,8 @@ ttex.Notice = class {
         // コメントを表示する
         msg.comment_array.forEach((comment) => {
             commentBox.append(
-                "<li>"+this.Companion._nameLink(comment)
-                +"<p>"+this.Companion._insertTags(comment.message_com)+"</p></li>"
+                `<li>${this.Companion._nameLink(comment)}`
+                +`<p>${this.Companion._insertTags(comment.message_com)}</p></li>`
             );
         });
         loadBox.appendTo(this.node);
@@ -130,11 +131,10 @@ ttex.Notice = class {
 /**
  * ttex.Notice.Companion
  */
-new class {
+ttex.Notice.prototype.Companion = new class {
     constructor() {
         this.BR_PATTERN = /\r\n|\n|\r/g;
         this.HREF_PATTERN = /https?:\/\/\S+/g;
-        ttex.Notice.prototype.Companion = this;
     }
     _br(str) {
         return str.replace(this.BR_PATTERN, "<br />");
@@ -148,7 +148,7 @@ new class {
         return str;
     }
     _nameLink(msg) {
-        return "<a>"+msg.user_name_sei+" "+msg.user_name_mei+"</a><time>"+msg.regist_date+"</time>";
+        return `<a>${msg.user_name_sei} ${msg.user_name_mei}</a><time>${msg.regist_date}</time>`;
     }
     _hideManyComments(commentBox) {
         commentBox.addClass("__ttex_hide_more");
@@ -243,7 +243,7 @@ ttex.Chrome = new class {
 ttex.Safari = new class {
     launch() {
         ttex.App.homeLink();
-        var loop = () => {
+        let loop = () => {
             ttex.App.shouldRun();
             setTimeout(loop, 1000);
         };
