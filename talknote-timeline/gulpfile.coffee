@@ -4,48 +4,83 @@ babel = require 'gulp-babel'
 uglify = require 'gulp-uglify'
 cleanCSS = require 'gulp-clean-css'
 runSequence = require 'run-sequence'
+fs = require 'graceful-fs'
+template = require 'gulp-template'
 
 path =
     src:
-        safari: 'src/vender/safari/**'
-        chrome: 'src/vender/chrome/**'
+        dir: 'src'
+        safari: 'src/vender/safari'
+        chrome: 'src/vender/chrome'
         lib: 'src/lib/**'
         css: 'src/css/**'
         js: 'src/js/**'
     build:
-        safari: 'build/safari/talknote-timeline.safariextension'
-        chrome: 'build/chrome/talknote-timeline.safariextension'
+        safari: 'build/safari'
+        chrome: 'build/chrome'
+        extension: 'talknote-timeline.safariextension'
+
+getVersions = () ->
+    version = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version
+    [_, major, minor, patch, ...] = version.match(/(\d+)\.(\d+)\.(\d+)/)
+    # 各バージョン番号が2桁を超えることはないだろう
+    bundleVersion = major * 10000 + minor * 100 + patch * 1
+    {version, bundleVersion}
 
 gulp.task 'clean', (cb) ->
     rimraf('./build', cb)
 
 gulp.task 'safari', () ->
-    gulp.src(path.src.safari)
-        .pipe(gulp.dest(path.build.safari))
-    gulp.src([path.src.lib,
-            'node_modules/babel-polyfill/dist/polyfill.js'])
-        .pipe(gulp.dest("#{path.build.safari}/lib"))
-    gulp.src(path.src.css)
-        .pipe(cleanCSS())
-        .pipe(gulp.dest("#{path.build.safari}/css"))
-    gulp.src(path.src.js)
-        .pipe(babel(presets: ['es2015']))
-        .pipe(uglify())
-        .pipe(gulp.dest("#{path.build.safari}/js"))
+    # vender
+    gulp.src ["#{path.src.safari}/**", "!#{path.src.safari}/Info.plist"]
+        .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}")
+    # config
+    versions = getVersions()
+    gulp.src "#{path.src.dir}/updates.plist"
+        .pipe template(versions)
+        .pipe gulp.dest("#{path.build.safari}")
+    gulp.src "#{path.src.safari}/Info.plist"
+        .pipe template(versions)
+        .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}")
+    # lib
+    gulp.src [path.src.lib,
+             'node_modules/babel-polyfill/dist/polyfill.js']
+        .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/lib")
+    # css
+    gulp.src path.src.css
+        .pipe cleanCSS()
+        .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/css")
+    # js
+    gulp.src path.src.js
+        .pipe babel(presets: ['es2015'])
+        .pipe uglify()
+        .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/js")
 
 gulp.task 'chrome', () ->
-    gulp.src(path.src.chrome)
-        .pipe(gulp.dest(path.build.chrome))
-    gulp.src(path.src.lib)
-        .pipe(gulp.dest("#{path.build.chrome}/lib"))
-    gulp.src(path.src.css)
-        .pipe(cleanCSS())
-        .pipe(gulp.dest("#{path.build.chrome}/css"))
-    gulp.src(path.src.js)
-        .pipe(gulp.dest("#{path.build.chrome}/js"))
+    # vender
+    gulp.src ["#{path.src.chrome}/**", "!#{path.src.chrome}/manifest.json"]
+        .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}")
+    # config
+    versions = getVersions()
+    gulp.src "#{path.src.dir}/updates.xml"
+        .pipe template(versions)
+        .pipe gulp.dest("#{path.build.chrome}")
+    gulp.src "#{path.src.chrome}/manifest.json"
+        .pipe template(versions)
+        .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}")
+    # lib
+    gulp.src path.src.lib
+        .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/lib")
+    # css
+    gulp.src path.src.css
+        .pipe cleanCSS()
+        .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/css")
+    # js
+    gulp.src path.src.js
+        .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/js")
 
 gulp.task 'watch', () ->
-    gulp.watch 'src/**', ['safari', 'chrome']
+    gulp.watch "#{path.src.dir}/**", ['safari', 'chrome']
 
 gulp.task 'build', (cb) ->
     runSequence('clean', ['safari', 'chrome'], cb)
