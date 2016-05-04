@@ -101,7 +101,9 @@ ttex.Notice = class {
             let restUrl = ttex.TalknoteAPI.toRestUrl(postUrl);
             // 既出の投稿であればスキップ
             ttex.NoticeContainer.uniqueCall(restUrl, () => {
-                ttex.TalknoteAPI.getPost(restUrl, this._expandPost);
+                ttex.TalknoteAPI.getPost(restUrl, (msg) => {
+                    this._expandPost(msg);
+                });
             });
         });
     }
