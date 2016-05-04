@@ -10,11 +10,11 @@
        <key>Developer Identifier</key>
        <string>C2AGCLBW3A</string>
        <key>CFBundleVersion</key>
-       <string>4</string>
+       <string>${ bundleVersion }</string>
        <key>CFBundleShortVersionString</key>
-       <string>1.0.3</string>
+       <string>${ version }</string>
        <key>URL</key>
-       <string>https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/v1.0.3/talknote-timeline.safariextz</string>
+       <string>https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/v${ version }/talknote-timeline.safariextz</string>
      </dict>
    </array>
 </dict>
