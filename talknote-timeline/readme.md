@@ -47,6 +47,12 @@ npm run build
 
 それぞれのディレクトリを各ブラウザの拡張機能管理画面から読み込むことで、デバッグすることができます。
 
-## 自動更新
+## バージョンアップ
+以下のコマンドでpackage.jsonのバージョンを更新します。
+```
+npm version [patch|minor|major]
+```
+ビルドした拡張機能を各ブラウザの拡張機能管理画面からパッケージングします。
 
-S3にホストしています。
+更新情報ファイル、拡張機能パッケージともS3にホストしています。  
+https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/
