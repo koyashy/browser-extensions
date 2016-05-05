@@ -6,18 +6,20 @@ cleanCSS = require 'gulp-clean-css'
 runSequence = require 'run-sequence'
 fs = require 'graceful-fs'
 template = require 'gulp-template'
+plumber = require 'gulp-plumber'
 
 path =
     src:
-        dir: 'src'
-        safari: 'src/vender/safari'
-        chrome: 'src/vender/chrome'
-        lib: 'src/lib/**'
-        css: 'src/css/**'
-        js: 'src/js/**'
+        dir: './src'
+        safari: './src/vender/safari'
+        chrome: './src/vender/chrome'
+        lib: './src/lib/**'
+        css: './src/css/**'
+        js: './src/js/**'
     build:
-        safari: 'build/safari'
-        chrome: 'build/chrome'
+        dir: './build'
+        safari: './build/safari'
+        chrome: './build/chrome'
         extension: 'talknote-timeline.safariextension'
 
 getVersions = () ->
@@ -28,7 +30,7 @@ getVersions = () ->
     {version, bundleVersion}
 
 gulp.task 'clean', (cb) ->
-    rimraf('./build', cb)
+    rimraf("#{path.build.dir}", cb)
 
 gulp.task 'safari', () ->
     # vender
@@ -48,10 +50,12 @@ gulp.task 'safari', () ->
         .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/lib")
     # css
     gulp.src path.src.css
+        .pipe plumber()
         .pipe cleanCSS()
         .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/css")
     # js
     gulp.src path.src.js
+        .pipe plumber()
         .pipe babel(presets: ['es2015'])
         .pipe uglify()
         .pipe gulp.dest("#{path.build.safari}/#{path.build.extension}/js")
@@ -73,10 +77,12 @@ gulp.task 'chrome', () ->
         .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/lib")
     # css
     gulp.src path.src.css
+        .pipe plumber()
         .pipe cleanCSS()
         .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/css")
     # js
     gulp.src path.src.js
+        .pipe plumber()
         .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/js")
 
 gulp.task 'watch', () ->
