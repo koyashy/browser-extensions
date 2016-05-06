@@ -67,8 +67,9 @@ ttex.NoticeContainer = {
     },
     _markRead() {
         $("<div class='__ttex_markread'></div>")
-            .append($("<a>mark all read</a>").click((event) => {
+            .append($("<a title='表示されている通知を全て既読にします'>mark all read</a>").click((event) => {
                 $("li.status.unread .do_read_action").click();
+                return false;
             }))
             .appendTo(ttex.Html.markReadBox());
     },
