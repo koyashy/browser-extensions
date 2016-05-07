@@ -7,6 +7,7 @@ var ttex = ttex || {};
  */
 ttex.App = new class {
     constructor() {
+        this.EXTENSION_TITLE = "TIMELINE @extention";
         this.NEWS_URL_PATTERN = /\/[^/]+\/news\/($|\?|#)/;
         this.HOMELINK_PATTERN = /^\/([^/]+)\/index\/.*/;
     }
@@ -26,7 +27,8 @@ ttex.App = new class {
         let url = link.attr("href");
         if (this.HOMELINK_PATTERN.test(url)) {
             let newsUrl = url.replace(this.HOMELINK_PATTERN, "/$1/news/");
-            link.attr("href", newsUrl);
+            link.attr("title", ttex.App.EXTENSION_TITLE)
+                .attr("href", newsUrl);
         }
     }
 };
@@ -63,14 +65,15 @@ ttex.NoticeContainer = {
         ttex.Html.container().attr("data-ttex-init", true);
     },
     _title() {
-        ttex.Html.title().text("TIMELINE @extention");
+        ttex.Html.title().text(ttex.App.EXTENSION_TITLE);
     },
     _markRead() {
         $("<div class='__ttex_markread'></div>")
-            .append($("<a title='表示されている通知を全て既読にします'>mark all read</a>").click((event) => {
-                $("li.status.unread .do_read_action").click();
-                return false;
-            }))
+            .append($("<a>mark all read</a>")
+                .attr("title", "表示されている通知を全て既読にします")
+                .click((event) => {
+                    $("li.status.unread .do_read_action").click();
+                    return false;}))
             .appendTo(ttex.Html.markReadBox());
     },
     _resetEntries() {
@@ -157,6 +160,7 @@ ttex.Notice.prototype.Companion = new class {
             .insertBefore(commentBox)
             .append(
                 $("<a>...more comments...</a>")
+                    .attr("title", "以前のコメントをすべて表示します")
                     .click((event) => {
                         $(event.target).remove();
                         commentBox.removeClass("__ttex_hide_more");
