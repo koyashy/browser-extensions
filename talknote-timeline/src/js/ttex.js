@@ -1,5 +1,8 @@
 "use strict";
 
+/**
+ * namespace
+ */
 var ttex = ttex || {};
 
 /**

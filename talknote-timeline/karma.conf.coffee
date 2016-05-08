@@ -17,7 +17,8 @@ module.exports = (config) ->
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'src/lib/*.js',
-      'src/js/*.js',
+      'src/js/ttex.js',
+      'src/js/ttex-beta.js',
       'spec/**/*.spec.coffee'
     ]
 

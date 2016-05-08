@@ -25,6 +25,7 @@
 				<string>lib/polyfill.js</string>
 				<string>lib/jquery-2.2.1.min.js</string>
 				<string>js/ttex.js</string>
+				<string>js/ttex-beta.js</string>
 				<string>js/content-safari.js</string>
 			</array>
 		</dict>
