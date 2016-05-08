@@ -85,7 +85,7 @@ gulp.task 'chrome', () ->
         .pipe plumber()
         .pipe gulp.dest("#{path.build.chrome}/#{path.build.extension}/js")
 
-gulp.task 'watch', () ->
+gulp.task 'watch', ['build'], () ->
     gulp.watch "#{path.src.dir}/**", ['safari', 'chrome']
 
 gulp.task 'build', (cb) ->
