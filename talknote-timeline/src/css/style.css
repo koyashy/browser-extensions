@@ -9,6 +9,10 @@
     background: #FFFFF5 !important;
 }
 
+.__ttex_report_issue {
+    margin: 0 7px;
+}
+
 .__ttex_readahead a:hover,
 .__ttex_markread a:hover {
     cursor: pointer;
