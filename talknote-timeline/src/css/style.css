@@ -3,6 +3,7 @@
 .news_message li.status {
     word-wrap: break-word;
     overflow-wrap : break-word;
+    word-break: break-all;
     border-bottom: 1px solid #D2D9E7;
 }
 
