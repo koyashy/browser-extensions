@@ -10,7 +10,7 @@ Talknote「お知らせ」（[URL](https://company.talknote.com/*/news/)）に�
 ### Safari
 [Safari用拡張機能ファイル](https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/latest/talknote-timeline.safariextz)をダウンロードしてSafariで開きます。
 ### Chrome
-[Chrome用拡張機能ファイル](https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/latest/talknote-timeline.safariextension.crx)をダウンロードし、Chromeの拡張機能ページへドラッグ＆ドロップします。
+[Chrome用拡張機能](https://chrome.google.com/webstore/detail/talknote-timeline-extensi/ggkhodjkejfppnadddjnkjabmnfohhpb)をインストールします。
 
 # 開発
 [実装](implement.md)
@@ -54,5 +54,8 @@ npm version [patch|minor|major]
 ```
 ビルドした拡張機能を各ブラウザの拡張機能管理画面からパッケージングします。
 
-更新情報ファイル、拡張機能パッケージともS3にホストしています。  
+Safari版については、更新情報ファイル、拡張機能パッケージともS3にホストしています。  
 https://s3-ap-northeast-1.amazonaws.com/mediba-browser-extensions/talknote-timeline/
+latest/配下に最新の拡張機能ファイルを置くとともに、vX.X.X/配下に該当のバージョンを置きます。
+
+Chrome版については、マーケットプレイスに限定公開しています。
